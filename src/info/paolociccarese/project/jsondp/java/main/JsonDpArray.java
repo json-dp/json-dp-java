@@ -36,6 +36,14 @@ public class JsonDpArray {
 		jsonArrayObjects = new ArrayList<JsonArrayObject>();
 	}
 	
+	public int size() {
+		int size=0;
+		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
+			size += jsonArrayObject.size();
+		}
+		return size;
+	}
+	
 	/**
 	 * Adds a value without associated data provenance to the array.
 	 * @param value The value to be added to the array
@@ -53,7 +61,6 @@ public class JsonDpArray {
 	 */
 	public void add(Object value, JSONObject provenance) {
 		JsonArrayObject jsonArrayObject = new JsonArrayObject();
-		System.out.println("adding= " + value);
 		jsonArrayObject.add(value);
 		for(Object k: provenance.keySet()) {
 			jsonArrayObject.putProvenance(k, provenance.get(k));
@@ -74,11 +81,27 @@ public class JsonDpArray {
 	}
 	
 	public Object get(int index) {
+		int cursor = 0;
+		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
+			if(jsonArrayObject.size()>0 && index>=(cursor+jsonArrayObject.size())) {
+				cursor = cursor + jsonArrayObject.size();
+			} else {
+				return jsonArrayObject.getValues().get(index-cursor);
+			}
+		}
 		return jsonArrayObjects.get(index).getValues();
 	}
 	
 	public Object getWithProvenance(int index) {
-		return jsonArrayObjects.get(index).getAll();
+		int cursor = 0;
+		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
+			if(jsonArrayObject.size()>0 && index>=(cursor+jsonArrayObject.size())) {
+				cursor = cursor + jsonArrayObject.size();
+			} else {
+				return jsonArrayObject.getValues().get(index-cursor);
+			}
+		}
+		return jsonArrayObjects.get(index).getValues();
 	}
 	
 	class JsonArrayObject {

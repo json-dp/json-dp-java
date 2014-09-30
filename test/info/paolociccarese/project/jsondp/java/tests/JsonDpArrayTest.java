@@ -20,8 +20,9 @@
 */
 package info.paolociccarese.project.jsondp.java.tests;
 
-import static org.junit.Assert.*;
+import info.paolociccarese.project.jsondp.java.main.JsonDpArray;
 
+import org.json.simple.JSONObject;
 import org.junit.Test;
 
 /**
@@ -30,8 +31,53 @@ import org.junit.Test;
 public class JsonDpArrayTest {
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void testArrayGet() {
+		JsonDpArray array = new JsonDpArray();
+		array.add("Paolo");
+		array.add("Nunzio");
+		array.add("Ciccarese");
+		
+		System.out.println(array.size());
+		System.out.println(array.getValues());
+		
+		System.out.println(array.get(0));
+		System.out.println(array.get(1));
+		System.out.println(array.get(2));
 	}
-
+	
+	@Test
+	public void testArrayGetWithProvenance() {
+		JSONObject provenance = new JSONObject();
+		provenance.put("importedFrom", "Public Record");
+		
+		JsonDpArray array = new JsonDpArray();
+		array.add("Paolo");
+		array.add("Nunzio", provenance);
+		array.add("Ciccarese");
+		
+		System.out.println(array.size());
+		System.out.println(array.getValues());
+		
+		System.out.println(array.get(0));
+		System.out.println(array.get(1));
+		System.out.println(array.get(2));
+	}
+	
+	@Test
+	public void testArrayGetWithProvenance2() {
+		JSONObject provenance = new JSONObject();
+		provenance.put("importedFrom", "Public Record");
+		
+		JsonDpArray array = new JsonDpArray();
+		array.add("Paolo");
+		array.add("Nunzio", provenance);
+		array.add("Ciccarese");
+		
+		System.out.println(array.size());
+		System.out.println(array.getValues());
+		
+		System.out.println(array.getWithProvenance(0));
+		System.out.println(array.getWithProvenance(1));
+		System.out.println(array.getWithProvenance(2));
+	}
 }
