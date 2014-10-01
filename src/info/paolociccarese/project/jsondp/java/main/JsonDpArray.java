@@ -20,6 +20,8 @@
 */
 package info.paolociccarese.project.jsondp.java.main;
 
+import info.paolociccarese.project.jsondp.java.main.JsonDpObject.JsonObjectCore;
+
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
@@ -36,6 +38,10 @@ public class JsonDpArray {
 		jsonArrayObjects = new ArrayList<JsonArrayObject>();
 	}
 	
+	/**
+	 * Returns the total size of the array.
+	 * @return The size of the array
+	 */
 	public int size() {
 		int size=0;
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
@@ -80,6 +86,11 @@ public class JsonDpArray {
 		return array;
 	}
 	
+	/**
+	 * Returns the requested item from the array.
+	 * @param index The index of the desired item.
+	 * @return The item corresponding to the requested index.
+	 */
 	public Object get(int index) {
 		int cursor = 0;
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
@@ -92,6 +103,11 @@ public class JsonDpArray {
 		return jsonArrayObjects.get(index).getValues();
 	}
 	
+	/**
+	 * Returns the requested item and its provenance data from the array.
+	 * @param index The index of the desired item.
+	 * @return The item (and its provenance data) corresponding to the requested index.
+	 */
 	public Object getWithProvenance(int index) {
 		int cursor = 0;
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
@@ -106,6 +122,25 @@ public class JsonDpArray {
 			}
 		}
 		return jsonArrayObjects.get(index).getValues();
+	}
+	
+	public String toStringWithProvenance() {
+		JSONArray array = new JSONArray();
+		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
+			array.add(jsonArrayObject.getAll());
+		}
+		return array.toString();
+	}
+	
+	/**
+	 * Returns the String representation of the data without the provenance.
+	 */
+	public String toString() {
+		JSONArray array = new JSONArray();
+		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
+			array.addAll(jsonArrayObject.getValues());
+		}
+		return array.toString();
 	}
 	
 	class JsonArrayObject {
@@ -141,12 +176,14 @@ public class JsonDpArray {
 		 */
 		protected JSONArray getAll() {
 			JSONArray array = new JSONArray();
-			for(int i=0; i<array.size();i++) {
+			for(int i=0; i<values.size();i++) {
 				array.add(values.get(i));
 			}
-			JSONObject provenanceObject = new JSONObject();
-			provenanceObject.put(PROVENANCE, provenanceObject);
-			array.add(provenanceObject);
+			if(provenanceObject!=null) {
+				JSONObject provenance = new JSONObject();
+				provenance.put(PROVENANCE, provenanceObject);
+				array.add(provenance);
+			}
 			return array;
 		}
 		
@@ -163,10 +200,19 @@ public class JsonDpArray {
 			provenanceObject.put(key, value);		
 		}
 		
+		/**
+		 * Returns all the provenance object
+		 * @return The provenance JSON object
+		 */
 		protected JSONObject getProvenance() {
 			return provenanceObject;
 		}
 		
+		/**
+		 * Returns the provenance object with the appropriate provenance
+		 * relationship.
+		 * @return The provenance JSON object with the provenance relationship
+		 */
 		protected JSONObject getProvenanceObject() {
 			JSONObject provenanceObject = new JSONObject();
 			provenanceObject.put(PROVENANCE, getProvenance());
