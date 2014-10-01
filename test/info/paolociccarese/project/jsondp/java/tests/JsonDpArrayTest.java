@@ -20,6 +20,7 @@
 */
 package info.paolociccarese.project.jsondp.java.tests;
 
+import static org.junit.Assert.*;
 import info.paolociccarese.project.jsondp.java.main.JsonDpArray;
 
 import org.json.simple.JSONObject;
@@ -32,21 +33,28 @@ public class JsonDpArrayTest {
 
 	@Test
 	public void testArrayGet() {
+		System.out.println("-----------------------");
+		System.out.println(" testArrayGet()");
+		System.out.println("-----------------------");
 		JsonDpArray array = new JsonDpArray();
 		array.add("Paolo");
 		array.add("Nunzio");
 		array.add("Ciccarese");
 		
-		System.out.println(array.size());
 		System.out.println(array.getValues());
 		
-		System.out.println(array.get(0));
-		System.out.println(array.get(1));
-		System.out.println(array.get(2));
+		assertEquals(3, array.size());
+		assertEquals("Paolo", array.get(0));
+		assertEquals("Nunzio", array.get(1));
+		assertEquals("Ciccarese", array.get(2));
 	}
 	
 	@Test
 	public void testArrayGetWithProvenance() {
+		System.out.println("-----------------------------");
+		System.out.println(" testArrayGetWithProvenance()");
+		System.out.println("-----------------------------");
+		
 		JSONObject provenance = new JSONObject();
 		provenance.put("importedFrom", "Public Record");
 		
@@ -55,16 +63,20 @@ public class JsonDpArrayTest {
 		array.add("Nunzio", provenance);
 		array.add("Ciccarese");
 		
-		System.out.println(array.size());
 		System.out.println(array.getValues());
 		
-		System.out.println(array.get(0));
-		System.out.println(array.get(1));
-		System.out.println(array.get(2));
+		assertEquals(3, array.size());
+		assertEquals("Paolo", array.get(0));
+		assertEquals("Nunzio", array.get(1));
+		assertEquals("Ciccarese", array.get(2));
 	}
 	
 	@Test
 	public void testArrayGetWithProvenance2() {
+		System.out.println("------------------------------");
+		System.out.println(" testArrayGetWithProvenance2()");
+		System.out.println("------------------------------");
+		
 		JSONObject provenance = new JSONObject();
 		provenance.put("importedFrom", "Public Record");
 		

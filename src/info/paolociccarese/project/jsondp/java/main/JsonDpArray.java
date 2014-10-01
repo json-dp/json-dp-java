@@ -98,7 +98,11 @@ public class JsonDpArray {
 			if(jsonArrayObject.size()>0 && index>=(cursor+jsonArrayObject.size())) {
 				cursor = cursor + jsonArrayObject.size();
 			} else {
-				return jsonArrayObject.getValues().get(index-cursor);
+				JSONArray a = new JSONArray();
+				a.add(jsonArrayObject.getValues().get(index-cursor));
+				if(jsonArrayObject.getProvenance()!=null) 
+					a.add(jsonArrayObject.getProvenanceObject());
+				return a;
 			}
 		}
 		return jsonArrayObjects.get(index).getValues();
@@ -157,6 +161,16 @@ public class JsonDpArray {
 				//dataObject.put(PROVENANCE, provenanceObject);
 			}
 			provenanceObject.put(key, value);		
+		}
+		
+		protected JSONObject getProvenance() {
+			return provenanceObject;
+		}
+		
+		protected JSONObject getProvenanceObject() {
+			JSONObject provenanceObject = new JSONObject();
+			provenanceObject.put(PROVENANCE, getProvenance());
+			return provenanceObject;
 		}
 		
 		/**
