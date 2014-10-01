@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import info.paolociccarese.project.jsondp.java.main.JsonDpArray;
 
 import org.json.simple.JSONObject;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -72,24 +71,37 @@ public class JsonDpArrayTest {
 	
 	@Test
 	public void testArrayGetWithProvenance() {
-		System.out.println("-----------------------------");
+		System.out.println("--------------------------------");
 		System.out.println(" testArrayGetWithProvenance()");
-		System.out.println("-----------------------------");
+		System.out.println("--------------------------------");
 		
 		JSONObject provenance = new JSONObject();
 		provenance.put("importedFrom", "Public Record");
 		
+		System.out.println(" Initializing the array... ");
 		JsonDpArray array = new JsonDpArray();
 		array.add("Paolo");
 		array.add("Nunzio", provenance);
 		array.add("Ciccarese");
+		System.out.println(" " + array.toStringWithProvenance());
 		
-		System.out.println(array.getValues());
-		
+		System.out.println(" * Checking size");
 		assertEquals(3, array.size());
+		
+		System.out.println(" * Checking item 0");
 		assertEquals("Paolo", array.get(0));
+		System.out.println(" * Checking item 1");
 		assertEquals("Nunzio", array.get(1));
+		System.out.println(" * Checking item 2");
 		assertEquals("Ciccarese", array.get(2));
+		
+		System.out.println(" * Checking toString");
+		assertEquals("[\"Paolo\",\"Nunzio\",\"Ciccarese\"]", array.toString());
+		System.out.println(" > " + array.toString());
+		
+		System.out.println(" * Checking toStringWithProvenance");
+		assertEquals("[[\"Paolo\"],[\"Nunzio\",{\"@provenance\":{\"importedFrom\":\"Public Record\"}}],[\"Ciccarese\"]]", array.toStringWithProvenance());
+		System.out.println(" > " + array.toStringWithProvenance());
 	}
 	
 	@Test
@@ -101,20 +113,29 @@ public class JsonDpArrayTest {
 		JSONObject provenance = new JSONObject();
 		provenance.put("importedFrom", "Public Record");
 		
+		System.out.println(" Initializing the array... ");
 		JsonDpArray array = new JsonDpArray();
 		array.add("Paolo");
 		array.add("Nunzio", provenance);
 		array.add("Ciccarese");
+		System.out.println(" " + array.toStringWithProvenance());
 		
-		System.out.println(array.size());
-		System.out.println(array.getValues());
+		System.out.println(" * Checking size");
+		assertEquals(3, array.size());
 		
-		System.out.println(array.getWithProvenance(0));
-		System.out.println(array.getWithProvenance(1));
-		System.out.println(array.getWithProvenance(2));
+		System.out.println(" * Checking item 0");
+		assertEquals("[\"Paolo\"]", array.getWithProvenance(0).toString());
+		System.out.println(" * Checking item 1");
+		assertEquals("[\"Nunzio\",{\"@provenance\":{\"importedFrom\":\"Public Record\"}}]", array.getWithProvenance(1).toString());
+		System.out.println(" * Checking item 2");
+		assertEquals("[\"Ciccarese\"]", array.getWithProvenance(2).toString());
 		
-		System.out.println(array.toString());
-		System.out.println("?????????????????");
-		System.out.println(array.toStringWithProvenance());
+		System.out.println(" * Checking toString");
+		assertEquals("[\"Paolo\",\"Nunzio\",\"Ciccarese\"]", array.toString());
+		System.out.println(" > " + array.toString());
+		
+		System.out.println(" * Checking toStringWithProvenance");
+		assertEquals("[[\"Paolo\"],[\"Nunzio\",{\"@provenance\":{\"importedFrom\":\"Public Record\"}}],[\"Ciccarese\"]]", array.toStringWithProvenance());
+		System.out.println(" > " + array.toStringWithProvenance());
 	}
 }
