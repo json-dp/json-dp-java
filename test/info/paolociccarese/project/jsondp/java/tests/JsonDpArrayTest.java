@@ -106,9 +106,9 @@ public class JsonDpArrayTest {
 	
 	@Test
 	public void testArrayGetWithProvenance2() {
-		System.out.println("------------------------------");
+		System.out.println("--------------------------------");
 		System.out.println(" testArrayGetWithProvenance2()");
-		System.out.println("------------------------------");
+		System.out.println("--------------------------------");
 		
 		JSONObject provenance = new JSONObject();
 		provenance.put("importedFrom", "Public Record");
