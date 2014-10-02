@@ -18,9 +18,9 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package info.paolociccarese.project.jsondp.java.main;
+package info.paolociccarese.project.jsondp.java.core;
 
-import info.paolociccarese.project.jsondp.java.main.JsonDpObject.JsonObjectCore;
+import info.paolociccarese.project.jsondp.java.core.JsonDpObject.JsonObjectCore;
 
 import java.util.ArrayList;
 

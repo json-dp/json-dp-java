@@ -18,10 +18,10 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package info.paolociccarese.project.jsondp.java.tests;
+package info.paolociccarese.project.jsondp.java.core;
 
 import static org.junit.Assert.*;
-import info.paolociccarese.project.jsondp.java.main.JsonDpObject;
+import info.paolociccarese.project.jsondp.java.core.JsonDpObject;
 
 import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
