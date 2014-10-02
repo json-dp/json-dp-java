@@ -1,78 +1,78 @@
 <project>
-<modelVersion>4.0.0</modelVersion>
-<groupId>info.paolociccarese.project.jsondp</groupId>
-<artifactId>json-dp</artifactId>
-<version>0.1</version>
-<name>json-dp</name>
-<!-- <packaging>jar</packaging> -->
-
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>info.paolociccarese.project.jsondp</groupId>
+	<artifactId>json-dp</artifactId>
+	<version>0.1</version>
+	<name>json-dp</name>
 
 	<properties>
 		<jsonsimple.version>1.1.1</jsonsimple.version>
+		<junit.version>4.11</junit.version>
 	</properties>
- 
+
 	<dependencies>
- 
+
 		<dependency>
 			<groupId>com.googlecode.json-simple </groupId>
 			<artifactId>json-simple</artifactId>
 			<version>${jsonsimple.version}</version>
 		</dependency>
 		<dependency>
-	<groupId>junit</groupId>
-	<artifactId>junit</artifactId>
-	<version>4.11</version>
-</dependency>
- 
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+		</dependency>
+
 	</dependencies>
 
-<build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-	        <excludes>
-	            <exclude>**/*Test.java</exclude>
-	        </excludes>
-	    </configuration>
-      </plugin>
-      
-      <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-jar-plugin</artifactId>
-		<version>2.4</version>
-		<configuration>
-			<archive>
-			  <manifest>
-				<addClasspath>true</addClasspath>
-				<classpathPrefix>dependency-jars/</classpathPrefix>
-			  </manifest>
-			</archive>
-		</configuration>
-	  </plugin>
-      
-      <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-dependency-plugin</artifactId>
-		<version>2.5.1</version>
-		<executions>
-		  <execution>
-			<id>copy-dependencies</id>
-			<phase>package</phase>
-			<goals>
-				<goal>copy-dependencies</goal>
-			</goals>
-			<configuration>
-				<includeGroupIds>json-simple</includeGroupIds>
-				<outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
-			</configuration>
-		  </execution>
-		 </executions>
-		</plugin>
-    </plugins>
-  </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<excludes>
+						<exclude>**/*Test.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>dependency-jars/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.5.1</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeGroupIds>json-simple</includeGroupIds>
+							<outputDirectory>${project.build.directory}/dependency-jars/
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
