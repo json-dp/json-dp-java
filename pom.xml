@@ -1,0 +1,8 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>info.paolociccarese.project.jsondp</groupId>
+  <artifactId>json-dp</artifactId>
+  <version>0.1</version>
+  <!-- <packaging>jar</packaging>  -->
+</project>
