@@ -165,4 +165,66 @@ public class JsonDpObjectTest {
 		System.out.println(" * Retrieving multiple firstName with provenance");
 		assertEquals("[{\"@provenance\":{\"importedFrom\":\"Public Record\"},\"firstName\":\"Paolo\"},{\"@provenance\":{\"importedFrom\":\"Friend\"},\"firstName\":\"Paolo Nunzio\"}]", jpo.getWithProvenance("firstName"));
 	}
+	
+	@Test
+	public void testComplexJsonObject() {
+		System.out.println("--------------------------------");
+		System.out.println(" testComplexJsonObject()");
+		System.out.println("--------------------------------");
+		
+		System.out.println(" Initializing the object... ");
+		JsonDpObject jpo = new JsonDpObject();
+		jpo.put("firstName", "Paolo");
+		jpo.put("middleName", "Nunzio");
+		jpo.put("lastName", "Ciccarese");
+		jpo.put("nickname", "Cicca");
+		System.out.println(" " + jpo.toString());
+		
+		//assertNotNull(jpo.toString());
+		
+		System.out.println(" * Checking firstName");
+		assertNotNull(jpo.get("firstName"));
+		assertEquals("Paolo", jpo.get("firstName"));
+		
+		System.out.println(" * Checking middleName");
+		assertNotNull(jpo.get("middleName"));
+		assertEquals("Nunzio", jpo.get("middleName"));
+		
+		System.out.println(" * Checking lastName");
+		assertNotNull(jpo.get("lastName"));
+		assertEquals("Ciccarese", jpo.get("lastName"));
+		
+		System.out.println(" * Checking nickname");
+		assertNotNull(jpo.get("nickname"));
+		assertEquals("Cicca", jpo.get("nickname"));
+	}
+	
+	@Test
+	public void testHierarchicalJsonObject() {
+		System.out.println("--------------------------------");
+		System.out.println(" testHierarchicalJsonObject()");
+		System.out.println("--------------------------------");
+		
+		System.out.println(" Initializing the object... ");
+		JSONObject provenance1 = new JSONObject();
+		provenance1.put("importedFrom", "Public Record");
+		
+		JSONObject provenance2 = new JSONObject();
+		provenance2.put("importedFrom", "Harvard Catalyst");
+		
+		JsonDpObject jpo = new JsonDpObject();
+		jpo.put("firstName", "Paolo", provenance1);
+		jpo.put("lastName", "Ciccarese", provenance1);
+	
+		JsonDpObject address = new JsonDpObject();
+		address.put("city", "Brookline", provenance1);
+		address.put("zip", "02446", provenance1);
+		address.put("street", "Harvard St.", provenance2);
+		
+		jpo.put("address", address, provenance1);
+		
+		System.out.println(" " + jpo.toString());
+		System.out.println(" " + jpo.toStringWithProvenance());
+	}
+		
 }

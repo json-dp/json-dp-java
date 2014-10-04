@@ -20,8 +20,6 @@
 */
 package info.paolociccarese.project.jsondp.java.core;
 
-import info.paolociccarese.project.jsondp.java.core.JsonDpObject.JsonObjectCore;
-
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;

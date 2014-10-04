@@ -161,6 +161,14 @@ public class JsonDpObject {
 		return array.toString();
 	}
 	
+	public Object getWithProvenance() {
+		JSONArray array = new JSONArray();
+		for(JsonObjectCore jsonObject: jsonObjects) {
+			array.add(jsonObject.getAll());
+		}
+		return array;
+	}
+	
 	/**
 	 * Returns the String representation of the data with the provenance.
 	 */
@@ -175,12 +183,22 @@ public class JsonDpObject {
 	/**
 	 * Returns the String representation of the data without the provenance.
 	 */
+//	public String toString() {
+//		JSONArray array = new JSONArray();
+//		for(JsonObjectCore jsonObject: jsonObjects) {
+//			JSONObject o = new JSONObject();
+//			array.add(jsonObject.getData());
+//		}
+//		return array.toString();
+//	}
 	public String toString() {
-		JSONArray array = new JSONArray();
+		JSONObject o = new JSONObject();
+		//JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
-			array.add(jsonObject.getData());
+			JSONObject jo = jsonObject.getData();
+			o.putAll(jo);
 		}
-		return array.toString();
+		return o.toString();
 	}
 	
 	class JsonObjectCore {
@@ -197,7 +215,9 @@ public class JsonDpObject {
 		protected JSONObject getAll() {
 			JSONObject obj = new JSONObject();
 			for(Object key: dataObject.keySet()) {
-				obj.put(key, dataObject.get(key));
+				if(dataObject.get(key) instanceof JsonDpObject) {
+					obj.put(key, ((JsonDpObject)dataObject.get(key)).getWithProvenance());
+				} else obj.put(key, dataObject.get(key));
 			}
 			obj.put(PROVENANCE, provenanceObject);
 			return obj;
