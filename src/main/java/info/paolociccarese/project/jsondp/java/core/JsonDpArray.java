@@ -225,25 +225,24 @@ public class JsonDpArray {
 		 */
 		protected JSONArray getValuesWithProvenance() {
 			JSONArray array = new JSONArray();
+			// Values
 			for(int i=0; i<values.size();i++) {
-				Object o = values.get(i);
-				if(o instanceof JsonDpObject)
-					array.add(((JsonDpObject)values.get(i)).getWithProvenance());
-				else
-					array.add(values.get(i));
+				Object arrayItem = values.get(i);
+				if(arrayItem instanceof JsonDpObject) {
+					array.add(((JsonDpObject)arrayItem).getWithProvenance());
+				} else if(arrayItem instanceof JsonDpArray) {
+					array.add((JSONArray) ((JsonDpArray)arrayItem).getWithProvenance());
+				} else {
+					array.add(arrayItem);
+				}
 			}
+			// Provenance
 			if(provenanceObject!=null) {
 				JSONObject provenance = new JSONObject();
 				provenance.put(PROVENANCE, provenanceObject);
 				array.add(provenance);
 			}
 			return array;
-		}
-		
-		
-		
-
-		
-		
+		}	
 	}
 }
