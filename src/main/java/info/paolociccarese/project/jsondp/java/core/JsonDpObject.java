@@ -27,15 +27,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
+ * This is the wrapper to the JSON Object. It extends the JSON Object with
+ * the provenance data.
  * @author Dr. Paolo Ciccarese
  */
 public class JsonDpObject {
 
-	ArrayList<JsonObjectCore> jsonObjects;
-		
-	public JsonDpObject() {
-		jsonObjects = new ArrayList<JsonObjectCore>();
-	}
+	ArrayList<JsonObjectCore> jsonObjects = new ArrayList<JsonObjectCore>();
 	
 	/**
 	 * Put a key/value pair without any provenance data.
