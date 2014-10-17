@@ -122,6 +122,14 @@ public class JsonDpArray {
 		return jsonArrayObjects.get(index).getValues();
 	}
 	
+	public JSONArray getWithProvenance() {
+		JSONArray array = new JSONArray();
+		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
+			array.add(jsonArrayObject.getAll());
+		}
+		return array;
+	}
+	
 	public String toStringWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
@@ -175,7 +183,11 @@ public class JsonDpArray {
 		protected JSONArray getAll() {
 			JSONArray array = new JSONArray();
 			for(int i=0; i<values.size();i++) {
-				array.add(values.get(i));
+				Object o = values.get(i);
+				if(o instanceof JsonDpObject)
+					array.add(((JsonDpObject)values.get(i)).getWithProvenance());
+				else
+					array.add(values.get(i));
 			}
 			if(provenanceObject!=null) {
 				JSONObject provenance = new JSONObject();

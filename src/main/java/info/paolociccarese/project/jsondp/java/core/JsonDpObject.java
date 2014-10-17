@@ -217,9 +217,14 @@ public class JsonDpObject {
 			for(Object key: dataObject.keySet()) {
 				if(dataObject.get(key) instanceof JsonDpObject) {
 					obj.put(key, ((JsonDpObject)dataObject.get(key)).getWithProvenance());
-				} else obj.put(key, dataObject.get(key));
+				} else if(dataObject.get(key) instanceof JsonDpArray) {
+					JSONArray values = (JSONArray) ((JsonDpArray)dataObject.get(key)).getWithProvenance();
+					obj.put(key, values);
+				} else {
+					 obj.put(key, dataObject.get(key));
+				}
 			}
-			obj.put(PROVENANCE, provenanceObject);
+			if(provenanceObject!=null) obj.put(PROVENANCE, provenanceObject);
 			return obj;
 		}
 		
