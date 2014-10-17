@@ -60,7 +60,7 @@ public class JsonDpObject {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			if(jsonObject.containsKey(key)) {
-				Object d = jsonObject.getPairValue(key);
+				Object d = jsonObject.getValue(key);
 				if(d!=null) array.add(d);
 			}
 		}
@@ -133,7 +133,7 @@ public class JsonDpObject {
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			if(jsonObject.containsKey(key)) {
 				if(jsonObject.containsProvenance(provenanceKey, provenanceValue)) {
-					return jsonObject.getPairValue(key);
+					return jsonObject.getValue(key);
 				}
 			}
 		}		
@@ -183,14 +183,6 @@ public class JsonDpObject {
 	/**
 	 * Returns the String representation of the data without the provenance.
 	 */
-//	public String toString() {
-//		JSONArray array = new JSONArray();
-//		for(JsonObjectCore jsonObject: jsonObjects) {
-//			JSONObject o = new JSONObject();
-//			array.add(jsonObject.getData());
-//		}
-//		return array.toString();
-//	}
 	public String toString() {
 		JSONObject o = new JSONObject();
 		//JSONArray array = new JSONArray();
@@ -214,6 +206,10 @@ public class JsonDpObject {
 		
 		JSONObject pairs = new JSONObject();;
 		
+		/**
+		 * Returns all the pairs as a JSONObject.
+		 * @return All the pairs.
+		 */
 		protected JSONObject getPairs() {
 			return pairs;
 		}
@@ -222,6 +218,11 @@ public class JsonDpObject {
 			pairs.put(key, value);
 		}
 		
+		/**
+		 * Returns true if the key is present
+		 * @param key	The key to look up
+		 * @return True if key present
+		 */
 		public boolean containsKey(Object key) {
 			return pairs.containsKey(key);
 		}
@@ -230,10 +231,19 @@ public class JsonDpObject {
 			return pairs.containsKey(key) && pairs.get(key).equals(value);
 		}
 		
-		public Object getPairValue(Object key) {
+		/**
+		 * Returns the value of the pair identified by the key
+		 * @param key	The key to look up
+		 * @return The value identified by the requested key.
+		 */
+		public Object getValue(Object key) {
 			return pairs.get(key);
 		}
 		
+		/**
+		 * Returns all the keys as a Set.
+		 * @return The key set.
+		 */
 		public Set pairsKeySet() {
 			return pairs.keySet();
 		}
@@ -277,6 +287,11 @@ public class JsonDpObject {
 			provenanceObject = provenance;
 		}
 
+		/**
+		 * Return the value of a specific key and its provenance.
+		 * @param key	The key to look up.
+		 * @return The requested value with provenance. 
+		 */
 		public JSONObject getValueAndProvenance(Object key) {
 			JSONObject obj = null;
 			if(pairs.containsKey(key)) {
