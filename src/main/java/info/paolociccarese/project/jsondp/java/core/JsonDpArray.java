@@ -125,7 +125,7 @@ public class JsonDpArray {
 	public JSONArray getWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.add(jsonArrayObject.getAll());
+			array.add(jsonArrayObject.getValuesWithProvenance());
 		}
 		return array;
 	}
@@ -133,7 +133,7 @@ public class JsonDpArray {
 	public String toStringWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.add(jsonArrayObject.getAll());
+			array.add(jsonArrayObject.getValuesWithProvenance());
 		}
 		return array.toString();
 	}
@@ -149,19 +149,21 @@ public class JsonDpArray {
 		return array.toString();
 	}
 	
+	/**
+	 * Internal JSON-DP array object. It encodes one or more 
+	 * array elements with the same provenance data. The values
+	 * array is initialized immediately while the provenance
+	 * object is initialized lazily.
+	 */
 	class JsonArrayObject {
 		
 		private static final String PROVENANCE = "@provenance";
-		
-		JSONArray values;
 		JSONObject provenanceObject;
 		
-		public JsonArrayObject() {
-			values = new JSONArray();
-		}
+		JSONArray values = new JSONArray();
 		
 		/**
-		 * Returns the number of value items.
+		 * Returns the number of value items for this array.
 		 * @return The number of value items.
 		 */
 		protected int size() {
@@ -170,6 +172,7 @@ public class JsonDpArray {
 		
 		/**
 		 * Adds a new value to the array without including any provenance data.
+		 * The value will be added as last item of the array.
 		 * @param value The value to be added to the array.
 		 */
 		protected void add(Object value) {
@@ -177,10 +180,50 @@ public class JsonDpArray {
 		}
 		
 		/**
+		 * Returns all the array values without provenance data.
+		 * @return The array of values for this JSON-DP array
+		 */
+		protected JSONArray getValues() {
+			return values;
+		}
+		
+		/**
+		 * Add a provanance key/value pair. The provenance data object
+		 * is initialized if necessary.
+		 * @param key	The key of the provenance pair
+		 * @param value The value of the provenance pair
+		 */
+		public void putProvenance(Object key, Object value) {
+			if(provenanceObject==null) {
+				provenanceObject = new JSONObject();
+			}
+			provenanceObject.put(key, value);		
+		}
+		
+		/**
+		 * Returns the provenance object
+		 * @return The provenance data as JSON object
+		 */
+		protected JSONObject getProvenance() {
+			return provenanceObject;
+		}
+		
+		/**
+		 * Returns the provenance object with the appropriate provenance
+		 * relationship. This is used for serialization with provenance.
+		 * @return The provenance JSON object with the provenance relationship
+		 */
+		protected JSONObject getProvenanceObject() {
+			JSONObject provenanceObject = new JSONObject();
+			provenanceObject.put(PROVENANCE, getProvenance());
+			return provenanceObject;
+		}
+		
+		/**
 		 * Returns all the array items with their provenance data.
 		 * @return The array items with provenance data.
 		 */
-		protected JSONArray getAll() {
+		protected JSONArray getValuesWithProvenance() {
 			JSONArray array = new JSONArray();
 			for(int i=0; i<values.size();i++) {
 				Object o = values.get(i);
@@ -197,44 +240,10 @@ public class JsonDpArray {
 			return array;
 		}
 		
-		/**
-		 * Add a key/value pair.
-		 * @param key	The key of the pair
-		 * @param value The value of the pair
-		 */
-		public void putProvenance(Object key, Object value) {
-			if(provenanceObject==null) {
-				provenanceObject = new JSONObject();
-				//dataObject.put(PROVENANCE, provenanceObject);
-			}
-			provenanceObject.put(key, value);		
-		}
 		
-		/**
-		 * Returns all the provenance object
-		 * @return The provenance JSON object
-		 */
-		protected JSONObject getProvenance() {
-			return provenanceObject;
-		}
 		
-		/**
-		 * Returns the provenance object with the appropriate provenance
-		 * relationship.
-		 * @return The provenance JSON object with the provenance relationship
-		 */
-		protected JSONObject getProvenanceObject() {
-			JSONObject provenanceObject = new JSONObject();
-			provenanceObject.put(PROVENANCE, getProvenance());
-			return provenanceObject;
-		}
+
 		
-		/**
-		 * Returns all the array values without the provenance.
-		 * @return
-		 */
-		protected JSONArray getValues() {
-			return values;
-		}
+		
 	}
 }
