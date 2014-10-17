@@ -214,6 +214,11 @@ public class JsonDpObject {
 			return pairs;
 		}
 		
+		/**
+		 * Adds a new key/value pair.
+		 * @param key	The key
+		 * @param value The value
+		 */
 		public void put(Object key, Object value) {
 			pairs.put(key, value);
 		}
@@ -227,6 +232,12 @@ public class JsonDpObject {
 			return pairs.containsKey(key);
 		}
 		
+		/**
+		 * Returns true if a key/value pair is present
+		 * @param key	The key to look up
+		 * @param value The value to match
+		 * @return True if key/value present.
+		 */
 		public boolean containsPair(Object key, Object value) {
 			return pairs.containsKey(key) && pairs.get(key).equals(value);
 		}
