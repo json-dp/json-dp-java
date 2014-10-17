@@ -44,7 +44,7 @@ public class JsonDpObject {
 	 */
 	public void put(Object key, Object value) {
 		JsonObjectCore jsonObject = new JsonObjectCore();
-		jsonObject.putData(key, value);
+		jsonObject.put(key, value);
 		jsonObjects.add(jsonObject);
 	}
 	
@@ -59,8 +59,8 @@ public class JsonDpObject {
 	public Object get(Object key) {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
-			if(jsonObject.containsDataKey(key)) {
-				Object d = jsonObject.getDataValue(key);
+			if(jsonObject.containsKey(key)) {
+				Object d = jsonObject.getPairValue(key);
 				if(d!=null) array.add(d);
 			}
 		}
@@ -107,14 +107,14 @@ public class JsonDpObject {
 			}
 			
 			if(match) {
-				jsonObject.putData(key, value);
+				jsonObject.put(key, value);
 				return;
 			}
 			
 		}
 		
 		JsonObjectCore jsonObject = new JsonObjectCore();
-		jsonObject.putData(key, value);
+		jsonObject.put(key, value);
 		for(Object k: provenance.keySet()) {
 			jsonObject.putProvenance(k, provenance.get(k));
 		}
@@ -131,9 +131,9 @@ public class JsonDpObject {
 	 */
 	public Object get(Object key, Object provenanceKey, Object provenanceValue) {
 		for(JsonObjectCore jsonObject: jsonObjects) {
-			if(jsonObject.containsDataKey(key)) {
+			if(jsonObject.containsKey(key)) {
 				if(jsonObject.containsProvenance(provenanceKey, provenanceValue)) {
-					return jsonObject.getDataValue(key);
+					return jsonObject.getPairValue(key);
 				}
 			}
 		}		
@@ -152,7 +152,7 @@ public class JsonDpObject {
 	public Object getWithProvenance(Object key) {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
-			if(jsonObject.containsDataKey(key)) {
+			if(jsonObject.containsKey(key)) {
 				JSONObject obj = jsonObject.getValueAndProvenance(key);
 				if(obj!=null) 
 					array.add(jsonObject.getValueAndProvenance(key));
@@ -164,7 +164,7 @@ public class JsonDpObject {
 	public Object getWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
-			array.add(jsonObject.getAll());
+			array.add(jsonObject.getPairsWithProvenance());
 		}
 		return array;
 	}
@@ -175,7 +175,7 @@ public class JsonDpObject {
 	public String toStringWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
-			array.add(jsonObject.getAll());
+			array.add(jsonObject.getPairsWithProvenance());
 		}
 		return array.toString();
 	}
@@ -195,104 +195,117 @@ public class JsonDpObject {
 		JSONObject o = new JSONObject();
 		//JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
-			JSONObject jo = jsonObject.getData();
+			JSONObject jo = jsonObject.getPairs();
 			o.putAll(jo);
 		}
 		return o.toString();
 	}
 	
+	/**
+	 * Internal JSON-DP object entity. It encodes one or more 
+	 * key/value pairs with the same provenance data. The key/value
+	 * container is initialized immediately while the provenance
+	 * object is initialized lazily.
+	 */
 	class JsonObjectCore {
 		
 		private static final String PROVENANCE = "@provenance";
-		
-		JSONObject dataObject;
 		JSONObject provenanceObject;
 		
-		public JsonObjectCore() {
-			dataObject = new JSONObject();
+		JSONObject pairs = new JSONObject();;
+		
+		protected JSONObject getPairs() {
+			return pairs;
 		}
 		
-		protected JSONObject getAll() {
-			JSONObject obj = new JSONObject();
-			for(Object key: dataObject.keySet()) {
-				if(dataObject.get(key) instanceof JsonDpObject) {
-					obj.put(key, ((JsonDpObject)dataObject.get(key)).getWithProvenance());
-				} else if(dataObject.get(key) instanceof JsonDpArray) {
-					JSONArray values = (JSONArray) ((JsonDpArray)dataObject.get(key)).getWithProvenance();
-					obj.put(key, values);
-				} else {
-					 obj.put(key, dataObject.get(key));
-				}
+		public void put(Object key, Object value) {
+			pairs.put(key, value);
+		}
+		
+		public boolean containsKey(Object key) {
+			return pairs.containsKey(key);
+		}
+		
+		public boolean containsPair(Object key, Object value) {
+			return pairs.containsKey(key) && pairs.get(key).equals(value);
+		}
+		
+		public Object getPairValue(Object key) {
+			return pairs.get(key);
+		}
+		
+		public Set pairsKeySet() {
+			return pairs.keySet();
+		}
+		
+		/**
+		 * Add a provanance key/value pair. The provenance data object
+		 * is initialized if necessary.
+		 * @param key	The key of the provenance pair
+		 * @param value The value of the provenance pair
+		 */
+		public void putProvenance(Object key, Object value) {
+			if(provenanceObject==null) {
+				provenanceObject = new JSONObject();
 			}
-			if(provenanceObject!=null) obj.put(PROVENANCE, provenanceObject);
-			return obj;
+			provenanceObject.put(key, value);		
 		}
 		
-		protected JSONObject getData() {
-			return dataObject;
-		}
-		
-		public void putData(Object key, Object value) {
-			dataObject.put(key, value);
-		}
-		
-		public boolean containsDataKey(Object key) {
-			return dataObject.containsKey(key);
-		}
-		
-		public boolean containsData(Object key, Object value) {
-			return dataObject.containsKey(key) && dataObject.get(key).equals(value);
-		}
-		
-		public Object getDataValue(Object key) {
-			return dataObject.get(key);
-		}
-		
-		public Set dataKeySet() {
-			return dataObject.keySet();
-		}
-		
-		protected JSONObject getProvenance() {
-			return provenanceObject;
-		}
-		
-		public void setProvenance(JSONObject provenance) {
-			provenanceObject = provenance;
-		}
-		
+		/**
+		 * Returns true if the provenance data contain a key/value pair.
+		 * @param key		The provenance data key
+		 * @param value		The provenance data value
+		 * @return True if the pair is present.
+		 */
 		public boolean containsProvenance(Object key, Object value) {
 			return provenanceObject.containsKey(key) && provenanceObject.get(key).equals(value);
 		}
 		
-		public void putProvenance(Object key, Object value) {
-			if(provenanceObject==null) {
-				provenanceObject = new JSONObject();
-				//dataObject.put(PROVENANCE, provenanceObject);
-			}
-			provenanceObject.put(key, value);		
+		/**
+		 * Returns the provenance object
+		 * @return The provenance data as JSON object
+		 */
+		protected JSONObject getProvenance() {
+			return provenanceObject;
+		}
+		
+		/**
+		 * Sets the provenance through a JSON object.
+		 * @param provenance	The JSON object with the provenance data
+		 */
+		public void setProvenance(JSONObject provenance) {
+			provenanceObject = provenance;
 		}
 
 		public JSONObject getValueAndProvenance(Object key) {
 			JSONObject obj = null;
-			if(dataObject.containsKey(key)) {
+			if(pairs.containsKey(key)) {
 				obj = new JSONObject();
-				obj.put(key, dataObject.get(key));
+				obj.put(key, pairs.get(key));
 				if(provenanceObject!=null)
 					obj.put(PROVENANCE, provenanceObject);
 			}			
 			return obj;
 		}
-
-//		public Object getProvenance() {
-//			if(provenanceObject==null) {
-//				provenanceObject = new JSONObject();
-//				dataObject.put(PROVENANCE, provenanceObject);
-//			}
-//			return dataObject.get(PROVENANCE);
-//		}
-			
-		public String toString() {
-			return getAll().toString();
+		
+		/**
+		 * Returns all the pairs with their provenance data.
+		 * @return The pairs with provenance data.
+		 */
+		protected JSONObject getPairsWithProvenance() {
+			JSONObject obj = new JSONObject();
+			for(Object key: pairs.keySet()) {
+				Object value = pairs.get(key);
+				if(value instanceof JsonDpObject) {
+					obj.put(key, ((JsonDpObject)value).getWithProvenance());
+				} else if(value instanceof JsonDpArray) {
+					obj.put(key, (JSONArray) ((JsonDpArray)value).getWithProvenance());
+				} else {
+					 obj.put(key, value);
+				}
+			}
+			if(provenanceObject!=null) obj.put(PROVENANCE, provenanceObject);
+			return obj;
 		}
 	}
 }

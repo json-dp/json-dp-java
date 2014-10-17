@@ -79,7 +79,7 @@ public class JsonDpArray {
 	public Object getValues() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.addAll(jsonArrayObject.getValues());
+			array.addAll(jsonArrayObject.getItems());
 		}
 		return array;
 	}
@@ -95,10 +95,10 @@ public class JsonDpArray {
 			if(jsonArrayObject.size()>0 && index>=(cursor+jsonArrayObject.size())) {
 				cursor = cursor + jsonArrayObject.size();
 			} else {
-				return jsonArrayObject.getValues().get(index-cursor);
+				return jsonArrayObject.getItems().get(index-cursor);
 			}
 		}
-		return jsonArrayObjects.get(index).getValues();
+		return jsonArrayObjects.get(index).getItems();
 	}
 	
 	/**
@@ -113,19 +113,19 @@ public class JsonDpArray {
 				cursor = cursor + jsonArrayObject.size();
 			} else {
 				JSONArray a = new JSONArray();
-				a.add(jsonArrayObject.getValues().get(index-cursor));
+				a.add(jsonArrayObject.getItems().get(index-cursor));
 				if(jsonArrayObject.getProvenance()!=null) 
 					a.add(jsonArrayObject.getProvenanceObject());
 				return a;
 			}
 		}
-		return jsonArrayObjects.get(index).getValues();
+		return jsonArrayObjects.get(index).getItems();
 	}
 	
 	public JSONArray getWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.add(jsonArrayObject.getValuesWithProvenance());
+			array.add(jsonArrayObject.getItemsWithProvenance());
 		}
 		return array;
 	}
@@ -133,7 +133,7 @@ public class JsonDpArray {
 	public String toStringWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.add(jsonArrayObject.getValuesWithProvenance());
+			array.add(jsonArrayObject.getItemsWithProvenance());
 		}
 		return array.toString();
 	}
@@ -144,13 +144,13 @@ public class JsonDpArray {
 	public String toString() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.addAll(jsonArrayObject.getValues());
+			array.addAll(jsonArrayObject.getItems());
 		}
 		return array.toString();
 	}
 	
 	/**
-	 * Internal JSON-DP array object. It encodes one or more 
+	 * Internal JSON-DP array entity. It encodes one or more 
 	 * array elements with the same provenance data. The values
 	 * array is initialized immediately while the provenance
 	 * object is initialized lazily.
@@ -160,31 +160,31 @@ public class JsonDpArray {
 		private static final String PROVENANCE = "@provenance";
 		JSONObject provenanceObject;
 		
-		JSONArray values = new JSONArray();
+		JSONArray items = new JSONArray();
 		
 		/**
 		 * Returns the number of value items for this array.
 		 * @return The number of value items.
 		 */
 		protected int size() {
-			return values.size();
+			return items.size();
 		}
 		
 		/**
 		 * Adds a new value to the array without including any provenance data.
-		 * The value will be added as last item of the array.
-		 * @param value The value to be added to the array.
+		 * The item will be added as last item of the array.
+		 * @param item The value to be added to the array.
 		 */
-		protected void add(Object value) {
-			values.add(value);
+		protected void add(Object item) {
+			items.add(item);
 		}
 		
 		/**
-		 * Returns all the array values without provenance data.
+		 * Returns all the array items without provenance data.
 		 * @return The array of values for this JSON-DP array
 		 */
-		protected JSONArray getValues() {
-			return values;
+		protected JSONArray getItems() {
+			return items;
 		}
 		
 		/**
@@ -223,11 +223,11 @@ public class JsonDpArray {
 		 * Returns all the array items with their provenance data.
 		 * @return The array items with provenance data.
 		 */
-		protected JSONArray getValuesWithProvenance() {
+		protected JSONArray getItemsWithProvenance() {
 			JSONArray array = new JSONArray();
 			// Values
-			for(int i=0; i<values.size();i++) {
-				Object arrayItem = values.get(i);
+			for(int i=0; i<items.size();i++) {
+				Object arrayItem = items.get(i);
 				if(arrayItem instanceof JsonDpObject) {
 					array.add(((JsonDpObject)arrayItem).getWithProvenance());
 				} else if(arrayItem instanceof JsonDpArray) {
