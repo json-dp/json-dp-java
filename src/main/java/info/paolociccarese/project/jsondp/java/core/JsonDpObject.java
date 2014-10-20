@@ -193,6 +193,10 @@ public class JsonDpObject implements JsonDpStream {
 		return o.toString();
 	}
 	
+	public String toString() {
+		return toJsonString();
+	}
+	
 	/**
 	 * Internal JSON-DP object entity. It encodes one or more 
 	 * key/value pairs with the same provenance data. The key/value

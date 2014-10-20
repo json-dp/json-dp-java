@@ -206,5 +206,19 @@ public class JsonDpObjectTest {
 		address.put("street", "Harvard St.", provenance2);
 		jpo.put("address", address, provenance1);
 		System.out.println(" " + jpo.toJsonWithProvenanceString());
+		
+		printLabel("firstName", "jpo.get(\"firstName\")", jpo.get("firstName").toString());
+		assertNotNull(jpo.get("firstName"));
+		assertEquals("Paolo", jpo.get("firstName"));
+		
+		printLabel("lastName", "jpo.get(\"lastName\")", jpo.get("lastName").toString());
+		assertNotNull(jpo.get("lastName"));
+		assertEquals("Ciccarese", jpo.get("lastName"));
+		
+		if(jpo.get("address") instanceof JsonDpStream) {
+			printLabel("address", "jpo.get(\"address\")", ((JsonDpStream)jpo.get("address")).toJsonString());
+			
+			printLabel("address", "jpo.getWithProvenance(\"address\")", jpo.getWithProvenance("address").toString());
+		}
 	}
 }
