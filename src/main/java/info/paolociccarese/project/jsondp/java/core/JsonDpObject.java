@@ -31,7 +31,7 @@ import org.json.simple.JSONObject;
  * the provenance data.
  * @author Dr. Paolo Ciccarese
  */
-public class JsonDpObject {
+public class JsonDpObject implements JsonDpStream {
 
 	ArrayList<JsonObjectCore> jsonObjects = new ArrayList<JsonObjectCore>();
 	
@@ -64,7 +64,7 @@ public class JsonDpObject {
 		}
 		if(array.size()==0) return null;
 		else if(array.size()==1) return array.get(0);
-		return array.toString();
+		return array;
 	}
 	
 	/**
@@ -95,12 +95,14 @@ public class JsonDpObject {
 		JsonObjectCore buffer;
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			boolean match = false;
-			for(Object k: provenance.keySet()) {
-				if(jsonObject.containsProvenance(k, provenance.get(k)))  {
-					match = true;
-				} else {
-					match = false;
-					break;
+			if(jsonObject.getProvenance()!=null) { 
+				for(Object k: provenance.keySet()) {
+					if(jsonObject.containsProvenance(k, provenance.get(k)))  {
+						match = true;
+					} else {
+						match = false;
+						break;
+					}
 				}
 			}
 			
@@ -170,7 +172,7 @@ public class JsonDpObject {
 	/**
 	 * Returns the String representation of the data with the provenance.
 	 */
-	public String toStringWithProvenance() {
+	public String toJsonWithProvenanceString() {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			array.add(jsonObject.getPairsWithProvenance());
@@ -181,7 +183,7 @@ public class JsonDpObject {
 	/**
 	 * Returns the String representation of the data without the provenance.
 	 */
-	public String toString() {
+	public String toJsonString() {
 		JSONObject o = new JSONObject();
 		//JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {

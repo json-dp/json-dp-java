@@ -28,13 +28,9 @@ import org.json.simple.JSONObject;
 /**
  * @author Dr. Paolo Ciccarese
  */
-public class JsonDpArray {
+public class JsonDpArray implements JsonDpStream {
 
-	ArrayList<JsonArrayObject> jsonArrayObjects;
-
-	public JsonDpArray() {
-		jsonArrayObjects = new ArrayList<JsonArrayObject>();
-	}
+	ArrayList<JsonArrayObject> jsonArrayObjects = new ArrayList<JsonArrayObject>();
 	
 	/**
 	 * Returns the total size of the array.
@@ -130,7 +126,7 @@ public class JsonDpArray {
 		return array;
 	}
 	
-	public String toStringWithProvenance() {
+	public String toJsonWithProvenanceString() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
 			array.add(jsonArrayObject.getItemsWithProvenance());
@@ -141,7 +137,7 @@ public class JsonDpArray {
 	/**
 	 * Returns the String representation of the data without the provenance.
 	 */
-	public String toString() {
+	public String toJsonString() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
 			array.addAll(jsonArrayObject.getItems());
