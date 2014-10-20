@@ -216,6 +216,11 @@ public class JsonDpObjectTest {
 		assertEquals("Ciccarese", jpo.get("lastName"));
 		
 		printLabel("address", "jpo.get(\"address\")", jpo.get("address").toString());
+		assertNotNull(jpo.get("address"));
+		assertEquals("{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"}", jpo.get("address").toString());
+		
 		printLabel("address", "jpo.getWithProvenance(\"address\")", jpo.getWithProvenance("address").toString());
+		assertNotNull(jpo.getWithProvenance("address"));
+		assertEquals("[{\"address\":{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"},\"@provenance\":{\"importedFrom\":\"Public Record\"}}]", jpo.getWithProvenance("address"));
 	}
 }
