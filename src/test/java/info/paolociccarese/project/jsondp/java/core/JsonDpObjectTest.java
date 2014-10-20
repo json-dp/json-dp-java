@@ -215,10 +215,7 @@ public class JsonDpObjectTest {
 		assertNotNull(jpo.get("lastName"));
 		assertEquals("Ciccarese", jpo.get("lastName"));
 		
-		if(jpo.get("address") instanceof JsonDpStream) {
-			printLabel("address", "jpo.get(\"address\")", ((JsonDpStream)jpo.get("address")).toJsonString());
-			
-			printLabel("address", "jpo.getWithProvenance(\"address\")", jpo.getWithProvenance("address").toString());
-		}
+		printLabel("address", "jpo.get(\"address\")", jpo.get("address").toString());
+		printLabel("address", "jpo.getWithProvenance(\"address\")", jpo.getWithProvenance("address").toString());
 	}
 }
