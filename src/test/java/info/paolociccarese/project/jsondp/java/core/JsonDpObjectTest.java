@@ -38,11 +38,15 @@ public class JsonDpObjectTest {
 		System.out.println("================================");
 	}
 	
+	private void printLabel(String name, String method, String result) {
+		System.out.println(" * Checking " + name + " \t " + method + " \t " + result);
+	}
+	
 	@Test
-	public void testSimpleJsonObject() {
-		System.out.println("--------------------------------");
-		System.out.println(" testSimpleJsonObject()");
-		System.out.println("--------------------------------");
+	public void testSimpleJsonObjectWithoutProvenance() {
+		System.out.println("-----------------------------------------");
+		System.out.println(" testSimpleJsonObjectWithoutProvenance()");
+		System.out.println("-----------------------------------------");
 		
 		System.out.println(" Initializing the object... ");
 		JsonDpObject jpo = new JsonDpObject();
@@ -52,158 +56,138 @@ public class JsonDpObjectTest {
 		jpo.put("nickname", "Cicca");
 		System.out.println(" " + jpo.toString());
 		
-		//assertNotNull(jpo.toString());
-		
-		System.out.println(" * Checking firstName");
+		printLabel("firstName", "jpo.get(\"firstName\")", jpo.get("firstName").toString());
 		assertNotNull(jpo.get("firstName"));
 		assertEquals("Paolo", jpo.get("firstName"));
 		
-		System.out.println(" * Checking middleName");
+		printLabel("firstName", "jpo.get(\"middleName\")", jpo.get("middleName").toString());
 		assertNotNull(jpo.get("middleName"));
 		assertEquals("Nunzio", jpo.get("middleName"));
 		
-		System.out.println(" * Checking lastName");
+		printLabel("firstName", "jpo.get(\"lastName\")", jpo.get("lastName").toString());
 		assertNotNull(jpo.get("lastName"));
 		assertEquals("Ciccarese", jpo.get("lastName"));
 		
-		System.out.println(" * Checking nickname");
+		printLabel("nickname", "jpo.get(\"nickname\")", jpo.get("nickname").toString());
 		assertNotNull(jpo.get("nickname"));
 		assertEquals("Cicca", jpo.get("nickname"));
 	}
 	
 	@Test
-	public void testCreationOfProvenancedJsonObject() {
+	public void testSimpleJsonObjectWithProvenance1() {
 		System.out.println("---------------------------------------");
-		System.out.println(" testCreationOfProvenancedJsonObject()");
+		System.out.println(" testSimpleJsonObjectWithProvenance1()");
 		System.out.println("---------------------------------------");
 		
-		System.out.println(" Initializing the object... ");
-		JSONObject provenance1 = new JSONObject();
-		provenance1.put("importedFrom", "Public Record");
-		
-		JSONObject provenance2 = new JSONObject();
-		provenance2.put("importedFrom", "Friend");
+		System.out.println(" Initializing the object... ");		
+		JSONObject provenance = new JSONObject();
+		provenance.put("importedFrom", "Friend");
 		
 		JsonDpObject jpo = new JsonDpObject();
-		jpo.put("firstName", "Paolo", provenance1);
-		jpo.put("middleName", "Nunzio", provenance1);
-		jpo.put("lastName", "Ciccarese", provenance1);
-		jpo.put("nickname", "Cicca", provenance2);
-		System.out.println(" " + jpo.toStringWithProvenance());
-
-		System.out.println(" * Retrieving firstName with provenance");
-		assertEquals("Paolo", jpo.get("firstName", "importedFrom", "Public Record"));
+		jpo.put("firstName", "Paolo");
+		jpo.put("middleName", "Nunzio");
+		jpo.put("lastName", "Ciccarese");
+		jpo.put("nickname", "Cicca", provenance);
+		System.out.println(" " + jpo.toJsonWithProvenanceString());
 		
-		System.out.println(" * Retrieving firstName with wrong provenance");
-		assertNotEquals("Paolo", jpo.get("firstName", "importedFrom", "Friend"));
+		printLabel("firstName", "jpo.get(\"firstName\")", jpo.get("firstName").toString());
+		assertNotNull(jpo.get("firstName"));
+		assertEquals("Paolo", jpo.get("firstName"));
 		
-		System.out.println(" * Retrieving middleName with provenance");
-		assertEquals("Nunzio", jpo.get("middleName", "importedFrom", "Public Record"));
+		printLabel("firstName", "jpo.get(\"middleName\")", jpo.get("middleName").toString());
+		assertNotNull(jpo.get("middleName"));
+		assertEquals("Nunzio", jpo.get("middleName"));
 		
-		System.out.println(" * Retrieving middleName with wrong provenance");
-		assertNotEquals("Nunzio", jpo.get("middleName", "importedFrom", "Friend"));
+		printLabel("firstName", "jpo.get(\"lastName\")", jpo.get("lastName").toString());
+		assertNotNull(jpo.get("lastName"));
+		assertEquals("Ciccarese", jpo.get("lastName"));
 		
-		System.out.println(" * Retrieving lastName with provenance");
-		assertEquals("Ciccarese", jpo.get("lastName", "importedFrom", "Public Record"));
-		
-		System.out.println(" * Retrieving lastName with wrong provenance");
-		assertNotEquals("Ciccarese", jpo.get("lastName", "importedFrom", "Friend"));
-		
-		System.out.println(" * Retrieving nickname with provenance");
-		assertEquals("Cicca", jpo.get("nickname", "importedFrom", "Friend"));
-		
-		System.out.println(" * Retrieving nickname with wrong provenance");
-		assertNotEquals("Cicca", jpo.get("nickname", "importedFrom", "Public Record"));
+		printLabel("nickname", "jpo.get(\"nickname\")", jpo.get("nickname").toString());
+		assertNotNull(jpo.get("nickname"));
+		assertEquals("Cicca", jpo.get("nickname"));
 	}
 	
 	@Test
-	public void testGetOfProvenancedJsonObject() {
-		System.out.println("----------------------------------");
-		System.out.println(" testGetOfProvenancedJsonObject()");
-		System.out.println("----------------------------------");
+	public void testSimpleJsonObjectWithProvenance2() {
+		System.out.println("---------------------------------------");
+		System.out.println(" testSimpleJsonObjectWithProvenance2()");
+		System.out.println("---------------------------------------");
 		
-		System.out.println(" Initializing the object... ");
+		System.out.println(" Initializing the object... ");		
 		JSONObject provenance1 = new JSONObject();
-		provenance1.put("importedFrom", "Public Record");
-		
+		provenance1.put("importedFrom", "Friends");
 		JSONObject provenance2 = new JSONObject();
-		provenance2.put("importedFrom", "Friend");
+		provenance2.put("importedFrom", "Parents");
 		
 		JsonDpObject jpo = new JsonDpObject();
-		jpo.put("firstName", "Paolo", provenance1);
-		jpo.put("middleName", "Nunzio", provenance1);
-		jpo.put("lastName", "Ciccarese", provenance1);
-		jpo.put("nickname", "Cicca", provenance2);
-		System.out.println(" " + jpo.toStringWithProvenance());
-
-		System.out.println(" * Checking provenance");
-		assertEquals("[{\"importedFrom\":\"Public Record\"},{\"importedFrom\":\"Friend\"}]", jpo.getProvenance());
+		jpo.put("firstName", "Paolo");
+		jpo.put("middleName", "Nunzio");
+		jpo.put("lastName", "Ciccarese");
+		jpo.put("nickname", "Cicca", provenance1);
+		jpo.put("nickname", "Tato", provenance2);
+		System.out.println(" " + jpo.toJsonWithProvenanceString());
+		
+		printLabel("firstName", "jpo.get(\"firstName\")", jpo.get("firstName").toString());
+		assertNotNull(jpo.get("firstName"));
+		assertEquals("Paolo", jpo.get("firstName"));
+		
+		printLabel("firstName", "jpo.get(\"middleName\")", jpo.get("middleName").toString());
+		assertNotNull(jpo.get("middleName"));
+		assertEquals("Nunzio", jpo.get("middleName"));
+		
+		printLabel("firstName", "jpo.get(\"lastName\")", jpo.get("lastName").toString());
+		assertNotNull(jpo.get("lastName"));
+		assertEquals("Ciccarese", jpo.get("lastName"));
+		
+		printLabel("nickname", "jpo.get(\"nickname\",\"importedFrom\",\"Parents\")", jpo.get("nickname", "importedFrom", "Parents").toString());
+		assertNotNull(jpo.get("nickname", "importedFrom", "Parents"));
+		assertEquals("Tato",  jpo.get("nickname", "importedFrom", "Parents").toString());
+		
+		printLabel("nickname", "jpo.get(\"nickname\",\"importedFrom\",\"Friends\")", jpo.get("nickname", "importedFrom", "Friends").toString());
+		assertNotNull(jpo.get("nickname", "importedFrom", "Friends"));
+		assertEquals("Cicca",  jpo.get("nickname", "importedFrom", "Friends").toString());
+		
+		printLabel("Retrieving multiple nicknames", "jpo.get(\"nickname\")", jpo.get("nickname").toString());
+		assertNotNull(jpo.get("nickname"));
+		assertEquals("[\"Cicca\",\"Tato\"]", jpo.get("nickname").toString());
+		
+		printLabel("Retrieving multiple nicknames", "jpo.getWithProvenance(\"nickname\")", jpo.getWithProvenance("nickname").toString());
+		assertNotNull(jpo.get("nickname"));
+		assertEquals("[{\"nickname\":\"Cicca\",\"@provenance\":{\"importedFrom\":\"Friends\"}},{\"nickname\":\"Tato\",\"@provenance\":{\"importedFrom\":\"Parents\"}}]", jpo.getWithProvenance("nickname").toString());
 	}
 	
 	@Test
-	public void testGetOfProvenancedDuplicateJsonObject() {
-		System.out.println("-------------------------------------------");
-		System.out.println(" testGetOfProvenancedDuplicateJsonObject()");
-		System.out.println("-------------------------------------------");
+	public void testSimpleJsonObjectWithProvenance3() {
+		System.out.println("---------------------------------------");
+		System.out.println(" testSimpleJsonObjectWithProvenance3()");
+		System.out.println("---------------------------------------");
 		
 		System.out.println(" Initializing the object... ");
 		JSONObject provenance1 = new JSONObject();
 		provenance1.put("importedFrom", "Public Record");
 		
 		JSONObject provenance2 = new JSONObject();
-		provenance2.put("importedFrom", "Friend");
+		provenance2.put("importedFrom", "Friends");
 		
 		JsonDpObject jpo = new JsonDpObject();
 		jpo.put("firstName", "Paolo", provenance1);
 		jpo.put("middleName", "Nunzio", provenance1);
 		jpo.put("lastName", "Ciccarese", provenance1);
 		jpo.put("firstName", "Paolo Nunzio", provenance2);
-		System.out.println(" " + jpo.toStringWithProvenance());
+		System.out.println(" " + jpo.toJsonWithProvenanceString());
 		
-		System.out.println(" * Retrieving multiple firstName");
-		assertEquals("[\"Paolo\",\"Paolo Nunzio\"]", jpo.get("firstName"));
-		System.out.println(" * Retrieving multiple firstName with provenance");
-		assertEquals("[{\"@provenance\":{\"importedFrom\":\"Public Record\"},\"firstName\":\"Paolo\"},{\"@provenance\":{\"importedFrom\":\"Friend\"},\"firstName\":\"Paolo Nunzio\"}]", jpo.getWithProvenance("firstName"));
+		printLabel("Retrieving multiple firstName", "jpo.get(\"firstName\")", jpo.get("firstName").toString());
+		assertEquals("[\"Paolo\",\"Paolo Nunzio\"]", jpo.get("firstName").toString());
+		
+		printLabel("Retrieving multiple firstName", "jpo.getWithProvenance(\"firstName\")", jpo.getWithProvenance("firstName").toString());
+		assertEquals("[{\"@provenance\":{\"importedFrom\":\"Public Record\"},\"firstName\":\"Paolo\"},{\"@provenance\":{\"importedFrom\":\"Friends\"},\"firstName\":\"Paolo Nunzio\"}]", jpo.getWithProvenance("firstName"));
 	}
 	
 	@Test
-	public void testComplexJsonObject() {
-		System.out.println("--------------------------------");
-		System.out.println(" testComplexJsonObject()");
-		System.out.println("--------------------------------");
-		
-		System.out.println(" Initializing the object... ");
-		JsonDpObject jpo = new JsonDpObject();
-		jpo.put("firstName", "Paolo");
-		jpo.put("middleName", "Nunzio");
-		jpo.put("lastName", "Ciccarese");
-		jpo.put("nickname", "Cicca");
-		System.out.println(" " + jpo.toString());
-		
-		//assertNotNull(jpo.toString());
-		
-		System.out.println(" * Checking firstName");
-		assertNotNull(jpo.get("firstName"));
-		assertEquals("Paolo", jpo.get("firstName"));
-		
-		System.out.println(" * Checking middleName");
-		assertNotNull(jpo.get("middleName"));
-		assertEquals("Nunzio", jpo.get("middleName"));
-		
-		System.out.println(" * Checking lastName");
-		assertNotNull(jpo.get("lastName"));
-		assertEquals("Ciccarese", jpo.get("lastName"));
-		
-		System.out.println(" * Checking nickname");
-		assertNotNull(jpo.get("nickname"));
-		assertEquals("Cicca", jpo.get("nickname"));
-	}
-	
-	@Test
-	public void testHierarchicalJsonObject() {
-		System.out.println("--------------------------------");
-		System.out.println(" testHierarchicalJsonObject()");
-		System.out.println("--------------------------------");
+	public void testComplexJsonObjectWithProvenance1() {
+		System.out.println("----------------------------------------");
+		System.out.println(" testComplexJsonObjectWithProvenance1()");
+		System.out.println("----------------------------------------");
 		
 		System.out.println(" Initializing the object... ");
 		JSONObject provenance1 = new JSONObject();
@@ -220,11 +204,7 @@ public class JsonDpObjectTest {
 		address.put("city", "Brookline", provenance1);
 		address.put("zip", "02446", provenance1);
 		address.put("street", "Harvard St.", provenance2);
-		
 		jpo.put("address", address, provenance1);
-		
-		System.out.println(" " + jpo.toString());
-		System.out.println(" " + jpo.toStringWithProvenance());
+		System.out.println(" " + jpo.toJsonWithProvenanceString());
 	}
-		
 }
