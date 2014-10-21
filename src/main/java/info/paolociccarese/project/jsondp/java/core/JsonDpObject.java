@@ -141,6 +141,18 @@ public class JsonDpObject implements JsonDpStream {
 	}
 	
 	/**
+	 * Returns all the values corresponding to a particular key and where the
+	 * provenance data includes the specified key/value pair.
+	 * @param key				The key of interest
+	 * @param provenanceKey		The provenance key
+	 * @param provenanceValues 	The allowed provenance values
+	 * @return The values given the key and provenance data.
+	 */
+	public Object get(Object key, Object provenanceKey, Set<Object> provenanceValues) {
+		throw new RuntimeException("Not implemented");
+	}
+	
+	/**
      * Return all the available values (including provenance data) for a 
      * particular key. As the object can contain several value pairs with 
      * different provenance data, an array might be returned. If no values 
