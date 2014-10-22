@@ -154,7 +154,15 @@ public class JsonDpObject implements JsonDpStream {
 		o.put(key, object.getValues());
 		return o;
 	}
-	
+
+	/**
+	 * Returns all the values and provenance corresponding to a particular key and where the
+	 * provenance data includes the specified key/value pair.
+	 * @param key				The key of interest
+	 * @param provenanceKey		The provenance key
+	 * @param provenanceValues 	The allowed provenance values
+	 * @return The values and provenance given the key and provenance data.
+	 */
 	public Object getWithProvenance(Object key, Object provenanceKey, Object... provenanceValues) {
 		JsonDpArray object = getValuesWithProvenance(key, provenanceKey, provenanceValues);	
 		JSONObject o = new JSONObject();
