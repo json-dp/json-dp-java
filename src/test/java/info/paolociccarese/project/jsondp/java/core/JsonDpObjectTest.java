@@ -20,8 +20,11 @@
 */
 package info.paolociccarese.project.jsondp.java.core;
 
-import static org.junit.Assert.*;
-import info.paolociccarese.project.jsondp.java.core.JsonDpObject;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
@@ -239,23 +242,25 @@ public class JsonDpObjectTest {
 		provenance1.put("importedFrom", "Public Record");
 		
 		JSONObject provenance2 = new JSONObject();
-		provenance2.put("importedFrom", "Harvard Catalyst");
-		
-		JSONObject provenance3 = new JSONObject();
-		provenance3.put("importedFrom", "Friends");
+		provenance2.put("importedFrom", "Friends");
 		
 		JsonDpObject jpo = new JsonDpObject();
 		jpo.put("firstName", "Paolo", provenance1);
-		jpo.put("middleName", "Nunzio", provenance3);
+		jpo.put("middleName", "Nunzio", provenance1);
 		jpo.put("lastName", "Ciccarese", provenance1);
-	
-		JsonDpObject address = new JsonDpObject();
-		address.put("city", "Brookline", provenance1);
-		address.put("zip", "02446", provenance1);
-		address.put("street", "Harvard St.", provenance2);
-		jpo.put("address", address, provenance1);
+		jpo.put("firstName", "Paolo Nunzio", provenance2);
 		System.out.println(" " + jpo.toJsonWithProvenanceString());
 		
-		assertNotNull(jpo.get("middleName", "importedFrom", "Friends"));
+		printLabel("firstName", "jpo.get(\"firstName\",\"importedFrom\",\"Friends\")", jpo.get("firstName", "importedFrom", "Friends").toString());
+		assertNotNull(jpo.get("firstName", "importedFrom", "Friends"));	
+		assertEquals("Paolo Nunzio", jpo.get("firstName", "importedFrom", "Friends"));
+		
+		printLabel("firstName", "jpo.get(\"firstName\",\"importedFrom\",\"Public Record\")", jpo.get("firstName", "importedFrom", "Public Record").toString());
+		assertNotNull(jpo.get("firstName", "importedFrom", "Public Record"));	
+		assertEquals("Paolo", jpo.get("firstName", "importedFrom", "Public Record"));
+		
+		printLabel("firstName", "jpo.get(\"firstName\",\"importedFrom\",\"Friends\",\"Public Record\")", jpo.get("firstName", "importedFrom", "Friends","Public Record").toString());
+		assertNotNull(jpo.get("firstName", "importedFrom", "Friends","Public Record"));	
+		assertEquals("{\"firstName\":[\"Paolo\",\"Paolo Nunzio\"]}", jpo.get("firstName", "importedFrom", "Friends","Public Record").toString());
 	}
 }

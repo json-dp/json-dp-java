@@ -148,8 +148,49 @@ public class JsonDpObject implements JsonDpStream {
 	 * @param provenanceValues 	The allowed provenance values
 	 * @return The values given the key and provenance data.
 	 */
-	public Object get(Object key, Object provenanceKey, Set<Object> provenanceValues) {
-		throw new RuntimeException("Not implemented");
+	public Object get(Object key, Object provenanceKey, Object... provenanceValues) {
+		JsonDpArray object = new JsonDpArray();
+		for(JsonObjectCore jsonObject: jsonObjects) {
+			if(jsonObject.containsKey(key)) {
+				for(Object provenanceValue: provenanceValues) {
+					if(jsonObject.containsProvenance(provenanceKey, provenanceValue)) {
+						JSONObject prov = new JSONObject();
+						prov.put(provenanceKey, provenanceValue);
+						object.add(jsonObject.getValue(key), prov);
+					}
+				}
+			}
+		}		
+		JSONObject o = new JSONObject();
+		o.put(key, object.getValues());
+		return o;
+	}
+	
+	public Object getWithProvenance(Object key, Object provenanceKey, Object... provenanceValues) {
+		JsonDpArray object = new JsonDpArray();
+		for(JsonObjectCore jsonObject: jsonObjects) {
+			if(jsonObject.containsKey(key)) {
+				for(Object provenanceValue: provenanceValues) {
+					if(jsonObject.containsProvenance(provenanceKey, provenanceValue)) {
+						JSONObject prov = new JSONObject();
+						prov.put(provenanceKey, provenanceValue);
+						object.add(jsonObject.getValue(key), prov);
+					}
+				}
+			}
+		}		
+		JSONObject o = new JSONObject();
+		o.put(key, object.getWithProvenance());
+		return o;
+	}
+	
+	public boolean containsKey(Object key) {
+		for(JsonObjectCore jsonObject: jsonObjects) {
+			if(jsonObject.containsKey(key)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
