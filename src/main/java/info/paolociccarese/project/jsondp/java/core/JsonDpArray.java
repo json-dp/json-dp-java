@@ -145,6 +145,10 @@ public class JsonDpArray implements JsonDpStream {
 		return array.toString();
 	}
 	
+	public String toString() {
+		return toJsonString();
+	}
+	
 	/**
 	 * Internal JSON-DP array entity. It encodes one or more 
 	 * array elements with the same provenance data. The values
