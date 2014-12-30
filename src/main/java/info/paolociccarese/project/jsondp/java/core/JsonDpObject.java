@@ -24,14 +24,81 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
 /**
- * This is the wrapper to the JSON Object. It extends the JSON Object with
- * the provenance data.
+ * This class implements the JsonDpObject that is a wrapper to the JSON Object.
+ * It extends the JSON Object with optional provenance data.
+ * 
+ * <p>
+ * Eligible value items are: 
+ * <ul>
+ * <li>java.lang.String
+ * <li>JsonDpArray 
+ * <li>JsonDpObject
+ * <li>org.json.simple.JSONArray
+ * <li>org.json.simple.JSONObject.
+ * </ul>
+ * </p>
+ * 
+ * <p>
+ * A JSONObject such as:
+ * </p>
+ * 
+ * <pre>
+ * <code>
+ *    {
+ *       "Name":"Paolo Ciccarese",
+ *       "MiddleInitial":"N"
+ *    }
+ * </code>
+ * </pre>
+ * 
+ * <p>
+ * Becomes, in JsonDpObject terms:
+ * </p>
+ * 
+ * <pre>
+ * <code>
+ *    [
+ *       {
+ *           "Name":"Paolo Ciccarese",
+ *           "MiddleInitial":"N"
+ *           "@provenance": {
+ *               "importedFrom":"Public Record"
+ *           }
+ *       }
+ *    ]
+ * </code>
+ * </pre>
+ * 
+ * <p>
+ * Or, if the items have different provenance:
+ * </p>
+ * 
+ * <pre>
+ * <code>
+ *    [
+ *       {
+ *           "Name":"Paolo Ciccarese",
+ *           "@provenance": {
+ *               "importedFrom":"Public Record"
+ *           }
+ *       },
+ *       {
+ *           "MiddleInitial":"N"
+ *           "@provenance": {
+ *               "importedFrom":"Friend"
+ *           }
+ *       }
+ *    ]
+ * </code>
+ * </pre>
+ * 
  * @author Dr. Paolo Ciccarese
  */
-public class JsonDpObject implements JsonDpStream {
+public class JsonDpObject implements JsonDpAware {
 
 	ArrayList<JsonObjectCore> jsonObjects = new ArrayList<JsonObjectCore>();
 	
@@ -41,9 +108,58 @@ public class JsonDpObject implements JsonDpStream {
 	 * @param value The value
 	 */
 	public void put(Object key, Object value) {
-		JsonObjectCore jsonObject = new JsonObjectCore();
-		jsonObject.put(key, value);
-		jsonObjects.add(jsonObject);
+		if(isValueAcceptable(value)) {
+			JsonObjectCore jsonObject = new JsonObjectCore();
+			jsonObject.put(key, value);
+			jsonObjects.add(jsonObject);
+		} else throw new IllegalArgumentException("Only Strings, JSON and JSON-DP values are allowed." +
+				" Found " + value.getClass().getName());
+	}
+	
+	/**
+	 * Put a key/value pair with provenance data.
+	 * @param key			The key
+	 * @param value			The value
+	 * @param provenance	The provenance data
+	 */
+	public void put(Object key, Object value, JSONObject provenance) {
+		if(isValueAcceptable(value)) {
+			for(JsonObjectCore jsonObject: jsonObjects) {
+				boolean match = false;
+				if(jsonObject.getProvenance()!=null) { 
+					for(Object k: provenance.keySet()) {
+						if(jsonObject.containsProvenance(k, provenance.get(k)))  {
+							match = true;
+						} else {
+							match = false;
+							break;
+						}
+					}
+				}				
+				if(match) {
+					jsonObject.put(key, value);
+					return;
+				}				
+			}
+			
+			JsonObjectCore jsonObject = new JsonObjectCore();
+			jsonObject.put(key, value);
+			for(Object k: provenance.keySet()) {
+				jsonObject.putProvenance(k, provenance.get(k));
+			}
+			jsonObjects.add(jsonObject);
+		} else throw new IllegalArgumentException("Only Strings, JSON and JSON-DP values are allowed." +
+				" Found " + value.getClass().getName());
+	}
+	
+	/**
+	 * Returns true if the value is acceptable.
+	 * @param value		The value to be validated
+	 * @return True if the value is admissible.
+	 */
+	private boolean isValueAcceptable(Object value) {
+		return (value instanceof String || value instanceof JsonDpAware 
+			|| value instanceof JSONAware);
 	}
 	
 	/**
@@ -51,8 +167,8 @@ public class JsonDpObject implements JsonDpStream {
 	 * contain several value pairs with different provenance data, an array 
 	 * might be returned. If no values are present null is returned. If only 
 	 * one value is available, a JSON object is returned.
-	 * @param key The requested key
-	 * @return The value(s) for the requested key.
+	 * @param key 	The requested key
+	 * @return The value(s) for the requested key or null if the key is not present.
 	 */
 	public Object get(Object key) {
 		JSONArray array = new JSONArray();
@@ -65,6 +181,25 @@ public class JsonDpObject implements JsonDpStream {
 		if(array.size()==0) return null;
 		else if(array.size()==1) return array.get(0);
 		return array;
+	}
+	
+	public Object getWithProvenance(Object key) {
+		JsonDpArray array = new JsonDpArray();
+		for(JsonObjectCore jsonObject: jsonObjects) {
+			if(jsonObject.containsKey(key)) {
+				Object d = jsonObject.getValue(key);
+				if(d!=null) {
+					if(jsonObject.getProvenance()!=null) {
+						System.out.println(jsonObject.getProvenance());
+						array.add(d, jsonObject.getProvenance());
+						System.out.println(array.plainJsonWithProvenanceToString());
+					} else array.add(d);
+				}
+			}
+		}
+		if(array.size()==0) return null;
+		// TODO manage one single item and return it as JsonDpObject
+		else return array;
 	}
 	
 	/**
@@ -83,42 +218,6 @@ public class JsonDpObject implements JsonDpStream {
 		if(array.size()==0) return null;
 		else if(array.size()==1) return array.get(0);
 		return array.toString();
-	}
-	
-	/**
-	 * Put a key/value pair with provenance data.
-	 * @param key			The key
-	 * @param value			The value
-	 * @param provenance	The provenance data
-	 */
-	public void put(Object key, Object value, JSONObject provenance) {
-		JsonObjectCore buffer;
-		for(JsonObjectCore jsonObject: jsonObjects) {
-			boolean match = false;
-			if(jsonObject.getProvenance()!=null) { 
-				for(Object k: provenance.keySet()) {
-					if(jsonObject.containsProvenance(k, provenance.get(k)))  {
-						match = true;
-					} else {
-						match = false;
-						break;
-					}
-				}
-			}
-			
-			if(match) {
-				jsonObject.put(key, value);
-				return;
-			}
-			
-		}
-		
-		JsonObjectCore jsonObject = new JsonObjectCore();
-		jsonObject.put(key, value);
-		for(Object k: provenance.keySet()) {
-			jsonObject.putProvenance(k, provenance.get(k));
-		}
-		jsonObjects.add(jsonObject);
 	}
 	
 	/**
@@ -151,7 +250,7 @@ public class JsonDpObject implements JsonDpStream {
 	public Object get(Object key, Object provenanceKey, Object... provenanceValues) {
 		JsonDpArray object = getValuesWithProvenance(key, provenanceKey, provenanceValues);		
 		JSONObject o = new JSONObject();
-		o.put(key, object.getValues());
+		o.put(key, object.getAllValuesAsPlainJson());
 		return o;
 	}
 
@@ -166,7 +265,7 @@ public class JsonDpObject implements JsonDpStream {
 	public Object getWithProvenance(Object key, Object provenanceKey, Object... provenanceValues) {
 		JsonDpArray object = getValuesWithProvenance(key, provenanceKey, provenanceValues);	
 		JSONObject o = new JSONObject();
-		o.put(key, object.getWithProvenance());
+		o.put(key, object.getAllValuesAndProvenanceAsPlainJson());
 		return o;
 	}
 	
@@ -204,7 +303,7 @@ public class JsonDpObject implements JsonDpStream {
 	 * @param key The requested key
 	 * @return The values with the provenance data
 	 */
-	public Object getWithProvenance(Object key) {
+	public Object getAsJsonWithProvenance(Object key) {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			if(jsonObject.containsKey(key)) {
@@ -216,7 +315,7 @@ public class JsonDpObject implements JsonDpStream {
 		return array.toString();
 	}
 	
-	public Object getWithProvenance() {
+	public Object getAsJsonWithProvenance() {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			array.add(jsonObject.getPairsWithProvenance());
@@ -227,7 +326,7 @@ public class JsonDpObject implements JsonDpStream {
 	/**
 	 * Returns the String representation of the data with the provenance.
 	 */
-	public String toJsonWithProvenanceString() {
+	public String plainJsonWithProvenanceToString() {		
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			array.add(jsonObject.getPairsWithProvenance());
@@ -238,7 +337,7 @@ public class JsonDpObject implements JsonDpStream {
 	/**
 	 * Returns the String representation of the data without the provenance.
 	 */
-	public String toJsonString() {
+	public String plainJsonToString() {
 		JSONObject o = new JSONObject();
 		//JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
@@ -249,7 +348,7 @@ public class JsonDpObject implements JsonDpStream {
 	}
 	
 	public String toString() {
-		return toJsonString();
+		return plainJsonToString();
 	}
 	
 	/**
@@ -382,9 +481,9 @@ public class JsonDpObject implements JsonDpStream {
 			for(Object key: pairs.keySet()) {
 				Object value = pairs.get(key);
 				if(value instanceof JsonDpObject) {
-					obj.put(key, ((JsonDpObject)value).getWithProvenance());
+					obj.put(key, ((JsonDpObject)value).getAsJsonWithProvenance());
 				} else if(value instanceof JsonDpArray) {
-					obj.put(key, (JSONArray) ((JsonDpArray)value).getWithProvenance());
+					obj.put(key, (JSONArray) ((JsonDpArray)value).getAllValuesAndProvenanceAsPlainJson());
 				} else {
 					 obj.put(key, value);
 				}

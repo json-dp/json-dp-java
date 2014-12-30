@@ -65,8 +65,8 @@ public class JsonDpArrayTest {
 		System.out.println(" > " + array.toString());
 		
 		System.out.println(" * Checking toStringWithProvenance");
-		assertEquals("[[\"Paolo\"],[\"Nunzio\"],[\"Ciccarese\"]]", array.toJsonWithProvenanceString());
-		System.out.println(" > " + array.toJsonWithProvenanceString());
+		assertEquals("[[\"Paolo\"],[\"Nunzio\"],[\"Ciccarese\"]]", array.plainJsonWithProvenanceToString());
+		System.out.println(" > " + array.plainJsonWithProvenanceToString());
 	}
 	
 	@Test
@@ -83,7 +83,7 @@ public class JsonDpArrayTest {
 		array.add("Paolo");
 		array.add("Nunzio", provenance);
 		array.add("Ciccarese");
-		System.out.println(" " + array.toJsonWithProvenanceString());
+		System.out.println(" " + array.plainJsonWithProvenanceToString());
 		
 		System.out.println(" * Checking size");
 		assertEquals(3, array.size());
@@ -100,8 +100,8 @@ public class JsonDpArrayTest {
 		System.out.println(" > " + array.toString());
 		
 		System.out.println(" * Checking toStringWithProvenance");
-		assertEquals("[[\"Paolo\"],[\"Nunzio\",{\"@provenance\":{\"importedFrom\":\"Public Record\"}}],[\"Ciccarese\"]]", array.toJsonWithProvenanceString());
-		System.out.println(" > " + array.toJsonWithProvenanceString());
+		assertEquals("[[\"Paolo\"],[\"Nunzio\",{\"@provenance\":{\"importedFrom\":\"Public Record\"}}],[\"Ciccarese\"]]", array.plainJsonWithProvenanceToString());
+		System.out.println(" > " + array.plainJsonWithProvenanceToString());
 	}
 	
 	 	

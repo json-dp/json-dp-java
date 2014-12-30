@@ -23,13 +23,30 @@ package info.paolociccarese.project.jsondp.java.core;
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
 /**
+ * This class implements the JsonDpArray that optionally includes provenance
+ * for each array item. 
+ * 
+ * <p>
+ * Eligible array items are: 
+ * <ul>
+ * <li>java.lang.String
+ * <li>JsonDpArray 
+ * <li>JsonDpObject
+ * <li>org.json.simple.JSONArray
+ * <li>org.json.simple.JSONObject.
+ * </ul>
+ * </p>
+ * 
  * @author Dr. Paolo Ciccarese
  */
-public class JsonDpArray implements JsonDpStream {
+public class JsonDpArray implements JsonDpAware {
 
+	private static final boolean COMPACT = true;
+	
 	ArrayList<JsonArrayObject> jsonArrayObjects = new ArrayList<JsonArrayObject>();
 	
 	/**
@@ -46,44 +63,51 @@ public class JsonDpArray implements JsonDpStream {
 	
 	/**
 	 * Adds a value without associated data provenance to the array.
-	 * @param value The value to be added to the array
+	 * @param value 		The value to be added to the array
+	 * @throws IllegalArgumentException if the item value is not acceptable.
 	 */
 	public void add(Object value) {
-		JsonArrayObject jsonArrayObject = new JsonArrayObject();
-		jsonArrayObject.add(value);
-		jsonArrayObjects.add(jsonArrayObject);
+		if(isValueAcceptable(value)) {
+			JsonArrayObject jsonArrayObject = new JsonArrayObject();
+			jsonArrayObject.add(value);
+			jsonArrayObjects.add(jsonArrayObject);
+		} else throw new IllegalArgumentException("Only Strings, JSON and JSON-DP values are allowed." +
+			" Found " + value.getClass().getName());
 	}
 	
 	/**
 	 * Adds a value with associated data provenance to the array.
 	 * @param value			The value to be added to the array
 	 * @param provenance	The provenance data
+	 * @throws IllegalArgumentException if the item value is not acceptable.
 	 */
 	public void add(Object value, JSONObject provenance) {
-		JsonArrayObject jsonArrayObject = new JsonArrayObject();
-		jsonArrayObject.add(value);
-		for(Object k: provenance.keySet()) {
-			jsonArrayObject.putProvenance(k, provenance.get(k));
-		}
-		jsonArrayObjects.add(jsonArrayObject);
+		if(isValueAcceptable(value)) {
+			JsonArrayObject jsonArrayObject = new JsonArrayObject();
+			jsonArrayObject.add(value);
+			for(Object k: provenance.keySet()) {
+				jsonArrayObject.putProvenance(k, provenance.get(k));
+			}
+			jsonArrayObjects.add(jsonArrayObject);
+		} else throw new IllegalArgumentException("Only Strings, JSON and JSON-DP values are allowed." +
+				" Found " + value.getClass().getName());
 	}
 	
 	/**
-	 * Returns an array with all the values (no provenance)
-	 * @return Array of values.
+	 * Returns true if the value is acceptable.
+	 * @param value		The value to be validated
+	 * @return True if the value is admissible.
 	 */
-	public Object getValues() {
-		JSONArray array = new JSONArray();
-		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.addAll(jsonArrayObject.getItems());
-		}
-		return array;
+	private boolean isValueAcceptable(Object value) {
+		return (value instanceof String || value instanceof JsonDpAware 
+			|| value instanceof JSONAware);
 	}
 	
 	/**
 	 * Returns the requested item from the array.
 	 * @param index The index of the desired item.
-	 * @return The item corresponding to the requested index.
+	 * @return The item corresponding to the requested index or null.
+	 * @throws IndexOutOfBoundsException if the requested index exceeds the array size.
 	 */
 	public Object get(int index) {
 		int cursor = 0;
@@ -94,15 +118,33 @@ public class JsonDpArray implements JsonDpStream {
 				return jsonArrayObject.getItems().get(index-cursor);
 			}
 		}
-		return jsonArrayObjects.get(index).getItems();
+		return new IndexOutOfBoundsException("The requested index " + index + 
+				" does not exist as the total size of the array is " + size());
 	}
 	
 	/**
-	 * Returns the requested item and its provenance data from the array.
+	 * Replaces the array item with the specified index with 
+	 * the specified replacement.
+	 * @param index			The index of the item to replace
+	 * @param replacement	The replacement item
+	 */
+	public void replace(int index, Object replacement) {
+		// TODO validate index
+		if(isValueAcceptable(replacement)) {
+			JsonArrayObject jsonArrayObject = new JsonArrayObject();
+			jsonArrayObject.add(replacement);
+			jsonArrayObjects.set(index, jsonArrayObject);
+		} else throw new IllegalArgumentException("Only Strings, JSON and JSON-DP values are allowed." +
+				" Found " + replacement.getClass().getName());
+	}
+	
+	/**
+	 * Returns the requested item and its provenance data in a JSON array.
 	 * @param index The index of the desired item.
 	 * @return The item (and its provenance data) corresponding to the requested index.
+	 * @throws IndexOutOfBoundsException if the requested index exceeds the array size.
 	 */
-	public Object getWithProvenance(int index) {
+	public JSONArray getWithProvenanceAsPlainJson(int index) {
 		int cursor = 0;
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
 			if(jsonArrayObject.size()>0 && index>=(cursor+jsonArrayObject.size())) {
@@ -115,10 +157,27 @@ public class JsonDpArray implements JsonDpStream {
 				return a;
 			}
 		}
-		return jsonArrayObjects.get(index).getItems();
+		throw new IndexOutOfBoundsException("The requested index " + index + 
+				" does not exist as the total size of the array is " + size());
 	}
 	
-	public JSONArray getWithProvenance() {
+	/**
+	 * Returns a JSON array with all the values (no provenance)
+	 * @return JSON array of values.
+	 */
+	public JSONArray getAllValuesAsPlainJson() {
+		JSONArray array = new JSONArray();
+		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
+			array.addAll(jsonArrayObject.getItems());
+		}
+		return array;
+	}
+	
+	/**
+	 * Returns a JSON array with all the values and their provenance.
+	 * @return JSON array of values with the provenance
+	 */
+	public JSONArray getAllValuesAndProvenanceAsPlainJson() {
 		JSONArray array = new JSONArray();
 		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
 			array.add(jsonArrayObject.getItemsWithProvenance());
@@ -126,27 +185,25 @@ public class JsonDpArray implements JsonDpStream {
 		return array;
 	}
 	
-	public String toJsonWithProvenanceString() {
-		JSONArray array = new JSONArray();
-		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.add(jsonArrayObject.getItemsWithProvenance());
-		}
-		return array.toString();
+	@Override
+	public String toString() {
+		return plainJsonToString();
 	}
 	
 	/**
 	 * Returns the String representation of the data without the provenance.
+	 * @return The JSON array with all the values as a String.
 	 */
-	public String toJsonString() {
-		JSONArray array = new JSONArray();
-		for(JsonArrayObject jsonArrayObject:jsonArrayObjects) {
-			array.addAll(jsonArrayObject.getItems());
-		}
-		return array.toString();
+	public String plainJsonToString() {
+		return getAllValuesAsPlainJson().toString();
 	}
 	
-	public String toString() {
-		return toJsonString();
+	/**
+	 * Returns the String representation of the data with the provenance.
+	 * @return The JSON array with all the values and provenance as a String.
+	 */
+	public String plainJsonWithProvenanceToString() {
+		return getAllValuesAndProvenanceAsPlainJson().toString();
 	}
 	
 	/**
@@ -158,9 +215,16 @@ public class JsonDpArray implements JsonDpStream {
 	class JsonArrayObject {
 		
 		private static final String PROVENANCE = "@provenance";
-		JSONObject provenanceObject;
 		
+		/**
+		 * Collects all the items without or with a given provenance
+		 */
 		JSONArray items = new JSONArray();
+		
+		/**
+		 * Provenance object.
+		 */
+		JSONObject provenanceObject;
 		
 		/**
 		 * Returns the number of value items for this array.
@@ -193,7 +257,7 @@ public class JsonDpArray implements JsonDpStream {
 		 * @param key	The key of the provenance pair
 		 * @param value The value of the provenance pair
 		 */
-		public void putProvenance(Object key, Object value) {
+		protected void putProvenance(Object key, Object value) {
 			if(provenanceObject==null) {
 				provenanceObject = new JSONObject();
 			}
@@ -201,7 +265,7 @@ public class JsonDpArray implements JsonDpStream {
 		}
 		
 		/**
-		 * Returns the provenance object
+		 * Returns the provenance as JSON object
 		 * @return The provenance data as JSON object
 		 */
 		protected JSONObject getProvenance() {
@@ -221,7 +285,7 @@ public class JsonDpArray implements JsonDpStream {
 		
 		/**
 		 * Returns all the array items with their provenance data.
-		 * @return The array items with provenance data.
+		 * @return The array items with provenance data as a JSON array.
 		 */
 		protected JSONArray getItemsWithProvenance() {
 			JSONArray array = new JSONArray();
@@ -229,9 +293,9 @@ public class JsonDpArray implements JsonDpStream {
 			for(int i=0; i<items.size();i++) {
 				Object arrayItem = items.get(i);
 				if(arrayItem instanceof JsonDpObject) {
-					array.add(((JsonDpObject)arrayItem).getWithProvenance());
+					array.add(((JsonDpObject)arrayItem).getAsJsonWithProvenance());
 				} else if(arrayItem instanceof JsonDpArray) {
-					array.add((JSONArray) ((JsonDpArray)arrayItem).getWithProvenance());
+					array.add((JSONArray) ((JsonDpArray)arrayItem).getAllValuesAndProvenanceAsPlainJson());
 				} else {
 					array.add(arrayItem);
 				}
