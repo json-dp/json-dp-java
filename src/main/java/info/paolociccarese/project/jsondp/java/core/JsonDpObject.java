@@ -452,7 +452,7 @@ public class JsonDpObject implements JsonDpAware {
 		 * @return True if the pair is present.
 		 */
 		public boolean containsProvenance(Object key, Object value) {
-			return provenanceObject.containsKey(key) && provenanceObject.get(key).equals(value);
+			return provenanceObject!=null && provenanceObject.containsKey(key) && provenanceObject.get(key).equals(value);
 		}
 		
 		/**

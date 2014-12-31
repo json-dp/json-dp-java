@@ -169,5 +169,8 @@ public class JsonDpArrayTest {
 		info(" * Checking getProvenance");
 		assertEquals("[{\"importedFrom\":\"Public Record\"},{\"importedFrom\":\"Personal Record\"}]",array.getProvenance().toString());
 		info(" > " + array.getProvenance().toString());
+		
+		info(" * Checking containsProvenance(\"importedFrom\", \"Public Record\") (=true)");
+		assertEquals(true, array.containsProvenance("importedFrom", "Public Record"));
 	}
 }

@@ -240,6 +240,13 @@ public class JsonDpArray implements JsonDpAware {
 		return array.toString();
 	}
 	
+	public boolean containsProvenance(Object key, Object value) {
+		for(JsonArrayObject jsonObject: jsonArrayObjects) {
+			if(jsonObject.containsProvenance(key, value)) return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Returns a JSON array with all the values (no provenance)
 	 * @return JSON array of values.
@@ -353,7 +360,7 @@ public class JsonDpArray implements JsonDpAware {
 		 * @return True if the pair is present.
 		 */
 		public boolean containsProvenance(Object key, Object value) {
-			return provenanceObject.containsKey(key) && provenanceObject.get(key).equals(value);
+			return provenanceObject!=null && provenanceObject.containsKey(key) && provenanceObject.get(key).equals(value);
 		}
 		
 		/**
