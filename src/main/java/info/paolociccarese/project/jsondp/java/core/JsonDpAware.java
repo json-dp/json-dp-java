@@ -23,17 +23,17 @@ package info.paolociccarese.project.jsondp.java.core;
 /**
  * @author Dr. Paolo Ciccarese
  */
-public interface JsonDpStream {
+public interface JsonDpAware {
 
 	/**
 	 * Convert a json-dp object to text ignoring provenance.
 	 * @return The textual representation of the json-dp object without provenance.
 	 */
-	public String toJsonString();
+	public String plainJsonToString();
 	
 	/**
 	 * Convert a json-dp object to text including provenance.
 	 * @return The textual representation of the json-dp object with provenance.
 	 */
-	public String toJsonWithProvenanceString();
+	public String plainJsonWithProvenanceToString();
 }

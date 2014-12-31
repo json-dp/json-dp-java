@@ -154,9 +154,9 @@ public class JsonDpObjectTest {
 		assertNotNull(jpo.get("nickname"));
 		assertEquals("[\"Cicca\",\"Tato\"]", jpo.get("nickname").toString());
 		
-		printLabel("Retrieving multiple nicknames", "jpo.getWithProvenance(\"nickname\")", jpo.getAsJsonWithProvenance("nickname").toString());
+		printLabel("Retrieving multiple nicknames", "jpo.getWithProvenance(\"nickname\")", jpo.getWithProvenanceAsPlainJson("nickname").toString());
 		assertNotNull(jpo.get("nickname"));
-		assertEquals("[{\"nickname\":\"Cicca\",\"@provenance\":{\"importedFrom\":\"Friends\"}},{\"nickname\":\"Tato\",\"@provenance\":{\"importedFrom\":\"Parents\"}}]", jpo.getAsJsonWithProvenance("nickname").toString());
+		assertEquals("[{\"nickname\":\"Cicca\",\"@provenance\":{\"importedFrom\":\"Friends\"}},{\"nickname\":\"Tato\",\"@provenance\":{\"importedFrom\":\"Parents\"}}]", jpo.getWithProvenanceAsPlainJson("nickname").toString());
 	}
 	
 	@Test
@@ -182,8 +182,8 @@ public class JsonDpObjectTest {
 		printLabel("Retrieving multiple firstName", "jpo.get(\"firstName\")", jpo.get("firstName").toString());
 		assertEquals("[\"Paolo\",\"Paolo Nunzio\"]", jpo.get("firstName").toString());
 		
-		printLabel("Retrieving multiple firstName", "jpo.getWithProvenance(\"firstName\")", jpo.getAsJsonWithProvenance("firstName").toString());
-		assertEquals("[{\"@provenance\":{\"importedFrom\":\"Public Record\"},\"firstName\":\"Paolo\"},{\"@provenance\":{\"importedFrom\":\"Friends\"},\"firstName\":\"Paolo Nunzio\"}]", jpo.getAsJsonWithProvenance("firstName"));
+		printLabel("Retrieving multiple firstName", "jpo.getWithProvenance(\"firstName\")", jpo.getWithProvenanceAsPlainJson("firstName").toString());
+		assertEquals("[{\"@provenance\":{\"importedFrom\":\"Public Record\"},\"firstName\":\"Paolo\"},{\"@provenance\":{\"importedFrom\":\"Friends\"},\"firstName\":\"Paolo Nunzio\"}]", jpo.getWithProvenanceAsPlainJson("firstName"));
 	}
 	
 	@Test
@@ -222,9 +222,9 @@ public class JsonDpObjectTest {
 		assertNotNull(jpo.get("address"));
 		assertEquals("{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"}", jpo.get("address").toString());
 		
-		printLabel("address", "jpo.getWithProvenance(\"address\")", jpo.getAsJsonWithProvenance("address").toString());
-		assertNotNull(jpo.getAsJsonWithProvenance("address"));
-		assertEquals("[{\"address\":{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"},\"@provenance\":{\"importedFrom\":\"Public Record\"}}]", jpo.getAsJsonWithProvenance("address"));
+		printLabel("address", "jpo.getWithProvenance(\"address\")", jpo.getWithProvenanceAsPlainJson("address").toString());
+		assertNotNull(jpo.getWithProvenanceAsPlainJson("address"));
+		assertEquals("[{\"address\":{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"},\"@provenance\":{\"importedFrom\":\"Public Record\"}}]", jpo.getWithProvenanceAsPlainJson("address"));
 	
 		printLabel("all", "jpo", jpo.toString());
 		assertNotNull(jpo);

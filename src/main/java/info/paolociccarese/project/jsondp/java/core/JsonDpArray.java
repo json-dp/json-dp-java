@@ -20,6 +20,8 @@
 */
 package info.paolociccarese.project.jsondp.java.core;
 
+import info.paolociccarese.project.jsondp.java.core.JsonDpObject.JsonObjectCore;
+
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
@@ -41,6 +43,65 @@ import org.json.simple.JSONObject;
  * </ul>
  * </p>
  * 
+ * <p>
+ * A JSONArray such as:
+ * </p>
+ * 
+ * <pre>
+ * <code>
+ *    [
+ *       "Paolo Ciccarese",
+ *       "Paolo N Ciccarese"
+ *    ]
+ * </code>
+ * </pre>
+ * 
+ * <p>
+ * Becomes, in JsonDpArray terms:
+ * </p>
+ * 
+ * <pre>
+ * <code>
+ *    [
+ *       [
+ *           "Paolo Ciccarese",
+ *           "Paolo N Ciccarese",
+ *           {
+ *               "@provenance": {
+ *                   "importedFrom":"Public Record"
+ *               }
+ *           }
+ *       ]
+ *    ]
+ * </code>
+ * </pre>
+ * 
+ * <p>
+ * Or, if the items have different provenance:
+ * </p>
+ * 
+ * <pre>
+ * <code>
+ *    [
+ *       [
+ *           "Paolo Ciccarese",
+ *           {
+ *               "@provenance": {
+ *                   "importedFrom":"Public Record"
+ *               }
+ *           }
+ *       ],
+ *       [
+ *           "Paolo N Ciccarese",
+ *           {
+ *               "@provenance": {
+ *                   "contributedBy":"Friend"
+ *               }
+ *           }
+ *       ]
+ *    ]
+ * </code>
+ * </pre>
  * @author Dr. Paolo Ciccarese
  */
 public class JsonDpArray implements JsonDpAware {
@@ -162,6 +223,24 @@ public class JsonDpArray implements JsonDpAware {
 	}
 	
 	/**
+	 * Returns the provenance data for this object. As the object can
+	 * contain several sets of provenance data, an array  might be returned.
+	 * If no values are present null is returned. If only one set of provenance
+	 * data is available, a JSON object is returned. 
+	 * @return The provenance data. 
+	 */
+	public Object getProvenance() {
+		JSONArray array = new JSONArray();
+		for(JsonArrayObject jsonObject: jsonArrayObjects) {
+			JSONObject p = jsonObject.getProvenance();
+			if(p!=null) array.add(p);
+		}
+		if(array.size()==0) return null;
+		else if(array.size()==1) return array.get(0);
+		return array.toString();
+	}
+	
+	/**
 	 * Returns a JSON array with all the values (no provenance)
 	 * @return JSON array of values.
 	 */
@@ -185,9 +264,12 @@ public class JsonDpArray implements JsonDpAware {
 		return array;
 	}
 	
-	@Override
-	public String toString() {
-		return plainJsonToString();
+	/**
+	 * Returns the String representation of the data with the provenance.
+	 * @return The JSON array with all the values and provenance as a String.
+	 */
+	public String plainJsonWithProvenanceToString() {
+		return getAllValuesAndProvenanceAsPlainJson().toString();
 	}
 	
 	/**
@@ -198,12 +280,9 @@ public class JsonDpArray implements JsonDpAware {
 		return getAllValuesAsPlainJson().toString();
 	}
 	
-	/**
-	 * Returns the String representation of the data with the provenance.
-	 * @return The JSON array with all the values and provenance as a String.
-	 */
-	public String plainJsonWithProvenanceToString() {
-		return getAllValuesAndProvenanceAsPlainJson().toString();
+	@Override
+	public String toString() {
+		return plainJsonToString();
 	}
 	
 	/**
@@ -217,7 +296,7 @@ public class JsonDpArray implements JsonDpAware {
 		private static final String PROVENANCE = "@provenance";
 		
 		/**
-		 * Collects all the items without or with a given provenance
+		 * Collects all the items with no provenance or with a given provenance
 		 */
 		JSONArray items = new JSONArray();
 		
@@ -235,6 +314,14 @@ public class JsonDpArray implements JsonDpAware {
 		}
 		
 		/**
+		 * Returns all the array items without provenance data.
+		 * @return The array of values for this JSON-DP array
+		 */
+		protected JSONArray getItems() {
+			return items;
+		}
+		
+		/**
 		 * Adds a new value to the array without including any provenance data.
 		 * The item will be added as last item of the array.
 		 * @param item The value to be added to the array.
@@ -243,13 +330,8 @@ public class JsonDpArray implements JsonDpAware {
 			items.add(item);
 		}
 		
-		/**
-		 * Returns all the array items without provenance data.
-		 * @return The array of values for this JSON-DP array
-		 */
-		protected JSONArray getItems() {
-			return items;
-		}
+		// PROVENANCE
+		// ---------- 
 		
 		/**
 		 * Add a provanance key/value pair. The provenance data object
@@ -265,11 +347,29 @@ public class JsonDpArray implements JsonDpAware {
 		}
 		
 		/**
+		 * Returns true if the provenance data contain a key/value pair.
+		 * @param key		The provenance data key
+		 * @param value		The provenance data value
+		 * @return True if the pair is present.
+		 */
+		public boolean containsProvenance(Object key, Object value) {
+			return provenanceObject.containsKey(key) && provenanceObject.get(key).equals(value);
+		}
+		
+		/**
 		 * Returns the provenance as JSON object
 		 * @return The provenance data as JSON object
 		 */
 		protected JSONObject getProvenance() {
 			return provenanceObject;
+		}
+		
+		/**
+		 * Sets the provenance through a JSON object.
+		 * @param provenance	The JSON object with the provenance data
+		 */
+		public void setProvenance(JSONObject provenance) {
+			provenanceObject = provenance;
 		}
 		
 		/**
@@ -293,7 +393,7 @@ public class JsonDpArray implements JsonDpAware {
 			for(int i=0; i<items.size();i++) {
 				Object arrayItem = items.get(i);
 				if(arrayItem instanceof JsonDpObject) {
-					array.add(((JsonDpObject)arrayItem).getAsJsonWithProvenance());
+					array.add(((JsonDpObject)arrayItem).getAllValuesAndProvenanceAsPlainJson());
 				} else if(arrayItem instanceof JsonDpArray) {
 					array.add((JSONArray) ((JsonDpArray)arrayItem).getAllValuesAndProvenanceAsPlainJson());
 				} else {
@@ -302,9 +402,7 @@ public class JsonDpArray implements JsonDpAware {
 			}
 			// Provenance
 			if(provenanceObject!=null) {
-				JSONObject provenance = new JSONObject();
-				provenance.put(PROVENANCE, provenanceObject);
-				array.add(provenance);
+				array.add(getProvenanceObject());
 			}
 			return array;
 		}	

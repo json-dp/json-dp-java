@@ -89,7 +89,7 @@ import org.json.simple.JSONObject;
  *       {
  *           "MiddleInitial":"N"
  *           "@provenance": {
- *               "importedFrom":"Friend"
+ *               "contributedBy":"Friend"
  *           }
  *       }
  *    ]
@@ -108,6 +108,7 @@ public class JsonDpObject implements JsonDpAware {
 	 * @param value The value
 	 */
 	public void put(Object key, Object value) {
+		// TODO manage collisions
 		if(isValueAcceptable(value)) {
 			JsonObjectCore jsonObject = new JsonObjectCore();
 			jsonObject.put(key, value);
@@ -123,6 +124,7 @@ public class JsonDpObject implements JsonDpAware {
 	 * @param provenance	The provenance data
 	 */
 	public void put(Object key, Object value, JSONObject provenance) {
+		// TODO manage partially overlapping provenance
 		if(isValueAcceptable(value)) {
 			for(JsonObjectCore jsonObject: jsonObjects) {
 				boolean match = false;
@@ -285,6 +287,11 @@ public class JsonDpObject implements JsonDpAware {
 		return object;
 	}
 	
+	/**
+	 * Return true if the key is present
+	 * @param key	The requested key
+	 * @return True if key present
+	 */
 	public boolean containsKey(Object key) {
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			if(jsonObject.containsKey(key)) {
@@ -303,7 +310,7 @@ public class JsonDpObject implements JsonDpAware {
 	 * @param key The requested key
 	 * @return The values with the provenance data
 	 */
-	public Object getAsJsonWithProvenance(Object key) {
+	public JSONArray getWithProvenanceAsPlainJson(Object key) {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			if(jsonObject.containsKey(key)) {
@@ -312,10 +319,10 @@ public class JsonDpObject implements JsonDpAware {
 					array.add(jsonObject.getValueAndProvenance(key));
 			}
 		}
-		return array.toString();
+		return array;
 	}
 	
-	public Object getAsJsonWithProvenance() {
+	public JSONArray getAllValuesAndProvenanceAsPlainJson() {
 		JSONArray array = new JSONArray();
 		for(JsonObjectCore jsonObject: jsonObjects) {
 			array.add(jsonObject.getPairsWithProvenance());
@@ -325,13 +332,10 @@ public class JsonDpObject implements JsonDpAware {
 	
 	/**
 	 * Returns the String representation of the data with the provenance.
+	 * @return The JSON array with all the values and provenance as a String.
 	 */
 	public String plainJsonWithProvenanceToString() {		
-		JSONArray array = new JSONArray();
-		for(JsonObjectCore jsonObject: jsonObjects) {
-			array.add(jsonObject.getPairsWithProvenance());
-		}
-		return array.toString();
+		return getAllValuesAndProvenanceAsPlainJson().toString();
 	}
 	
 	/**
@@ -347,6 +351,7 @@ public class JsonDpObject implements JsonDpAware {
 		return o.toString();
 	}
 	
+	@Override
 	public String toString() {
 		return plainJsonToString();
 	}
@@ -360,9 +365,16 @@ public class JsonDpObject implements JsonDpAware {
 	class JsonObjectCore {
 		
 		private static final String PROVENANCE = "@provenance";
-		JSONObject provenanceObject;
+			
+		/**
+		 * Collects all the key/value parse with no provenance or with a given provenance
+		 */
+		JSONObject pairs = new JSONObject();
 		
-		JSONObject pairs = new JSONObject();;
+		/**
+		 * Provenance object.
+		 */
+		JSONObject provenanceObject;
 		
 		/**
 		 * Returns all the pairs as a JSONObject.
@@ -391,6 +403,15 @@ public class JsonDpObject implements JsonDpAware {
 		}
 		
 		/**
+		 * Returns the value of the pair identified by the key
+		 * @param key	The key to look up
+		 * @return The value identified by the requested key.
+		 */
+		public Object getValue(Object key) {
+			return pairs.get(key);
+		}
+		
+		/**
 		 * Returns true if a key/value pair is present
 		 * @param key	The key to look up
 		 * @param value The value to match
@@ -401,21 +422,15 @@ public class JsonDpObject implements JsonDpAware {
 		}
 		
 		/**
-		 * Returns the value of the pair identified by the key
-		 * @param key	The key to look up
-		 * @return The value identified by the requested key.
-		 */
-		public Object getValue(Object key) {
-			return pairs.get(key);
-		}
-		
-		/**
 		 * Returns all the keys as a Set.
 		 * @return The key set.
 		 */
-		public Set pairsKeySet() {
+		public Set keySet() {
 			return pairs.keySet();
 		}
+		
+		// PROVENANCE
+		// ---------- 
 		
 		/**
 		 * Add a provanance key/value pair. The provenance data object
@@ -481,7 +496,7 @@ public class JsonDpObject implements JsonDpAware {
 			for(Object key: pairs.keySet()) {
 				Object value = pairs.get(key);
 				if(value instanceof JsonDpObject) {
-					obj.put(key, ((JsonDpObject)value).getAsJsonWithProvenance());
+					obj.put(key, ((JsonDpObject)value).getAllValuesAndProvenanceAsPlainJson());
 				} else if(value instanceof JsonDpArray) {
 					obj.put(key, (JSONArray) ((JsonDpArray)value).getAllValuesAndProvenanceAsPlainJson());
 				} else {
