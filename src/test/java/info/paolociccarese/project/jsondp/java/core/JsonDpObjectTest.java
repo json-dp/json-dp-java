@@ -23,9 +23,6 @@ package info.paolociccarese.project.jsondp.java.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -182,8 +179,8 @@ public class JsonDpObjectTest {
 		printLabel("Retrieving multiple firstName", "jpo.get(\"firstName\")", jpo.get("firstName").toString());
 		assertEquals("[\"Paolo\",\"Paolo Nunzio\"]", jpo.get("firstName").toString());
 		
-		printLabel("Retrieving multiple firstName", "jpo.getWithProvenance(\"firstName\")", jpo.getWithProvenanceAsPlainJson("firstName").toString());
-		assertEquals("[{\"@provenance\":{\"importedFrom\":\"Public Record\"},\"firstName\":\"Paolo\"},{\"@provenance\":{\"importedFrom\":\"Friends\"},\"firstName\":\"Paolo Nunzio\"}]", jpo.getWithProvenanceAsPlainJson("firstName"));
+		printLabel("Retrieving multiple firstName", "jpo.getWithProvenanceAsPlainJson(\"firstName\")", jpo.getWithProvenanceAsPlainJson("firstName").toString());
+		assertEquals("[{\"@provenance\":{\"importedFrom\":\"Public Record\"},\"firstName\":\"Paolo\"},{\"@provenance\":{\"importedFrom\":\"Friends\"},\"firstName\":\"Paolo Nunzio\"}]", jpo.getWithProvenanceAsPlainJson("firstName").toString());
 	}
 	
 	@Test
@@ -222,9 +219,9 @@ public class JsonDpObjectTest {
 		assertNotNull(jpo.get("address"));
 		assertEquals("{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"}", jpo.get("address").toString());
 		
-		printLabel("address", "jpo.getWithProvenance(\"address\")", jpo.getWithProvenanceAsPlainJson("address").toString());
+		printLabel("address", "jpo.getWithProvenanceAsPlainJson(\"address\")", jpo.getWithProvenanceAsPlainJson("address").toString());
 		assertNotNull(jpo.getWithProvenanceAsPlainJson("address"));
-		assertEquals("[{\"address\":{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"},\"@provenance\":{\"importedFrom\":\"Public Record\"}}]", jpo.getWithProvenanceAsPlainJson("address"));
+		assertEquals("[{\"address\":{\"zip\":\"02446\",\"street\":\"Harvard St.\",\"city\":\"Brookline\"},\"@provenance\":{\"importedFrom\":\"Public Record\"}}]", jpo.getWithProvenanceAsPlainJson("address").toString());
 	
 		printLabel("all", "jpo", jpo.toString());
 		assertNotNull(jpo);

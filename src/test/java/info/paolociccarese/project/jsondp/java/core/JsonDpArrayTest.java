@@ -172,5 +172,36 @@ public class JsonDpArrayTest {
 		
 		info(" * Checking containsProvenance(\"importedFrom\", \"Public Record\") (=true)");
 		assertEquals(true, array.containsProvenance("importedFrom", "Public Record"));
+		
+		info(" * Checking containsProvenance(\"importedFrom\", \"Record\") (=false)");
+		assertEquals(false, array.containsProvenance("importedFrom", "Record"));
+	}
+	
+	@Test
+	public void testArrayGetWithMixedComplexProvenance() {
+		info("------------------------------------------");
+		info(" testArrayGetWithMixedComplexProvenance()");
+		info("------------------------------------------");
+		
+		JSONObject provenance1 = new JSONObject();
+		provenance1.put("importedFrom", "Public Record");
+		provenance1.put("importedBy", "Public Importer");
+		
+		JSONObject provenance2 = new JSONObject();
+		provenance2.put("importedFrom", "Personal Record");
+		
+		info(" Initializing the array... ");
+		JsonDpArray array = new JsonDpArray();
+		array.add("Paolo");
+		array.add("Nunzio", provenance1);
+		array.add("Nunzio", provenance2);
+		array.add("Ciccarese");
+		info(" " + array.plainJsonWithProvenanceToString());
+		
+		info(" * Checking size (=4)");
+		assertEquals(4, array.size());
+		
+		info(" * Checking containsProvenance(\"importedFrom\", \"Public Record\") (=true)");
+		assertEquals(true, array.containsProvenance("importedFrom", "Public Record"));
 	}
 }
