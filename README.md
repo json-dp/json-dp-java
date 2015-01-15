@@ -14,11 +14,14 @@ Apache License Version 2.0, January 2004
 json-dp-java uses [Gradle](https://www.gradle.org/) for resolving dependencies, for creating the build and even for 
 creating an Ecplise project that can be imported in your workspace.
 
+For creating the Eclipse project
+> gradle eclipse
+
 
 <br/>
 
 ### SOFTWARE CREDITS
 
-This software is written by:
+This software has been originally written by:
 
    - [Paolo Ciccarese](http://www.paolociccarse.info), paolo.ciccarese at gmail.com 
