@@ -15,7 +15,10 @@ json-dp-java uses [Gradle](https://www.gradle.org/) for resolving dependencies, 
 creating an Ecplise project that can be imported in your workspace.
 
 For creating the Eclipse project
-> gradle eclipse
+> $ gradle eclipse
+
+For building the project
+> $ gradle build
 
 
 <br/>
