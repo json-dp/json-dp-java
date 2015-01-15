@@ -9,8 +9,10 @@ Apache License Version 2.0, January 2004
 
 <br/>
 
-### Buliding JAR
+### How to build
 
+json-dp-java uses [Gradle](https://www.gradle.org/) for resolving dependencies, for creating the build and even for 
+creating an Ecplise project that can be imported in your workspace.
 
 
 <br/>
